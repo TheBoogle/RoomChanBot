@@ -1,0 +1,3 @@
+luvit main.lua
+
+pause
