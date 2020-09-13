@@ -75,23 +75,23 @@ async def ban(guild, userid, reason):
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
-	if ctx.content[0:1] != '$' and ctx.author.bot != True:
-		if 'tes' in ctx.content and 'room' in ctx.content:
+	if ctx.content.lower()[0:1] != '$' and ctx.author.bot != True:
+		if 'tes' in ctx.content.lower() and 'room' in ctx.content.lower():
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
-		elif 'can' in ctx.content and 'tes' in ctx.content:
+		elif 'can' in ctx.content.lower() and 'tes' in ctx.content.lower():
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
-		elif 'want' in ctx.content and 'tes' in ctx.content:
+		elif 'want' in ctx.content.lower() and 'tes' in ctx.content.lower():
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
-		elif 'sex' in ctx.content:
+		elif 'sex' in ctx.content.lower():
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from using that language')
-		elif 'cum' in ctx.content:
+		elif 'cum' in ctx.content.lower():
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from using that language')
-		elif 'secks' in ctx.content:
+		elif 'secks' in ctx.content.lower():
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from using that language')
 	await bot.process_commands(ctx)
