@@ -60,7 +60,7 @@ async def resetnicknames(ctx):
 
 @bot.command()
 async def membercount(ctx):
-	await ctx.send(len(ctx.guild.members))
+	await ctx.send("`"+str(len(ctx.guild.members))+"` member's")
 
 @bot.event
 async def on_command_error(ctx,error):
@@ -76,7 +76,7 @@ async def ban(guild, userid, reason):
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
-	if ctx.content[0:1] != '$':
+	if ctx.content[0:1] != '$' and ctx.author.bot != True:
 		if 'te' in ctx.content and 'room' in ctx.content:
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from asking to test RooM 2')
