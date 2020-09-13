@@ -1,0 +1,102 @@
+import discord
+from discord.ext.commands import Bot
+from discord.ext import commands
+import random
+import asyncio
+import aiohttp
+import os
+
+waittime=30
+
+players=[]
+playersprimary=[None]
+winner=None
+debug=True
+playersid=[]
+playerslocation=[None]
+playerssecondary=[None]
+playersliving=[None]
+locations=["Military Base", "Underground Shelter", "The Farm"]
+deadlyLocations=[]
+primaryWeapons=["Assault Rifle", "Submachine Gun", "Shotgun"]
+secondaryWeapons=["Sniper Rifle", "Shotgun", "Pistol", "Submachine Gun"]
+
+class BattleRoyale(commands.Cog):
+	
+	def __init__(self, bot):
+		self.bot = bot
+	print("Loading Battle Royale Cog")
+	@commands.command(aliases=['br-join', 'joinbr', 'brjoin'])
+	async def join(self, ctx):
+		global joinable
+		
+		if joinable == True:
+			players.append(ctx.author.display_name+"#"+ctx.author.discriminator)
+			playersid.append(ctx.author.id)
+			playersprimary.append(None)
+			playerssecondary.append(None)
+			playerslocation.append(None)
+			playersliving.append(None)
+			await ctx.channel.purge(limit=1)
+			embed = discord.Embed(title="Player Joined!", description=ctx.author.mention+" joined the game!")
+			await ctx.send(embed=embed)
+		else:
+			await ctx.send('Game is already in progress')
+	@commands.command()
+	@commands.is_owner()
+	async def br(self, ctx, waittime: int=10, debug: bool=False):
+		global joinable
+		global players
+		global eventnum
+		global playing
+		playing = True
+		eventnum = 1
+		minplayers=0
+		embed = discord.Embed(title="A Discord Battle Royale Is Starting...", description="Type `$br-join` or `$join` to join! Game will start in "+str(waittime)+" seconds")
+		msg = await ctx.send(embed=embed)
+		
+		joinable=True
+		players=[]
+		await asyncio.sleep(waittime-3)
+		await ctx.send("Game starts in 3")
+		await asyncio.sleep(1)
+		await ctx.send("Game starts in 2")
+		await asyncio.sleep(1)
+		await ctx.send("Game starts in 1")
+		await asyncio.sleep(1)
+		if len(players) > minplayers:
+			embed = discord.Embed(title="Player List", description="There are "+str(len(players))+" players who will be attending | Prize: :dollar: 10,000", color=0xCE224D)
+			for i in players:
+				embed.add_field(name=i, value="--------")
+			await ctx.send(embed=embed)
+		else:
+			embed=discord.Embed(color=0xf00a3a)
+			embed.add_field(name="Error!", value="Not enough players joined the game!", inline=True)
+			await ctx.send(embed=embed)
+			winner=None
+		if len(players) > minplayers:
+			await asyncio.sleep(3)
+			joinable=False
+			length = len(players)
+			i=0
+			while i < length:
+				playersprimary[i] = random.choice(primaryWeapons)
+				
+				playerssecondary[i] = random.choice(secondaryWeapons)
+				playerslocation[i] = random.choice(locations)
+				playersliving[i] = True
+				if debug == True:
+					embed = discord.Embed(title="Player Info", description=players[i])
+					embed.add_field(name="Primary Weapon", value = playersprimary[i])
+					embed.add_field(name="Secondary Weapon", value = playerssecondary[i])
+					embed.add_field(name="Drop Location", value = playerslocation[i])
+					embed.add_field(name="Living?", value=str(playersliving[i]))
+					await ctx.send(embed=embed)
+					await asyncio.sleep(1)
+				else:
+					await ctx.send('`'+players[i]+' dropped at '+playerslocation[i]+'`')
+					
+				i=i+1
+			
+def setup(bot):
+	bot.add_cog(BattleRoyale(bot))
