@@ -33,7 +33,6 @@ async def on_ready():
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
 
-			
 @bot.command()
 async def testcommand (ctx):
 	await ctx.send("Test Completed")
@@ -79,10 +78,15 @@ async def on_message(ctx):
 	guild = ctx.guild
 	print(ctx.content[0:1])
 	if ctx.content[0:1] != '$':
-		if 'test' in ctx.content and 'room 2' in ctx.content:
-			await ctx.channel.send(author.mention+' was banned for asking for Room 2 testing')
-			await ban(guild, author.id, 'Asked for Room 2 testing')
-	
+		if 'te' in ctx.content and 'room' in ctx.content:
+			await ctx.delete()
+			await ctx.channel.send(author.mention+' Please refrain from asking to test RooM 2')
+		elif 'can' in ctx.content and 'te' in ctx.content:
+			await ctx.delete()
+			await ctx.channel.send(author.mention+' Please refrain from asking to test RooM 2')
+		elif 'want' in ctx.content and 'te' in ctx.content:
+			await ctx.delete()
+			await ctx.channel.send(author.mention+' Please refrain from asking to test RooM 2')
 	await bot.process_commands(ctx)
 @bot.event
 async def on_member_join(member):

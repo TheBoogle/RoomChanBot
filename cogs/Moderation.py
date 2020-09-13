@@ -30,14 +30,6 @@ class Mod(commands.Cog, ):
 			purged = await ctx.send('Purged '+str(amount)+' messages')
 			await asyncio.sleep(2)
 			await purged.edit(content="a", delete_after=0)
-	@commands.command(help='Spams messages')
-	@commands.has_permissions(administrator=True)
-	async def spam(self, ctx, amount: int=5, *, phrase,):
-		if amount <= maxSpam:
-			for x in range(0,amount):
-					await ctx.send(phrase)
-		else:
-			await ctx.send('`Amount must be less than or equal to '+str(maxSpam)+'`')
 	@commands.command('Sends an embed')
 	async def embed(self, ctx, title,  *, content):
 		await ctx.channel.purge(limit=1)
