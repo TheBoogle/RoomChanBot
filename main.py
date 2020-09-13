@@ -76,7 +76,6 @@ async def ban(guild, userid, reason):
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
-	print(ctx.content[0:1])
 	if ctx.content[0:1] != '$':
 		if 'te' in ctx.content and 'room' in ctx.content:
 			await ctx.delete()
@@ -88,46 +87,46 @@ async def on_message(ctx):
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from asking to test RooM 2')
 	await bot.process_commands(ctx)
-@bot.event
-async def on_member_join(member):
-	try:
-		if member.bot == False:
-			channel=None
-			try:
-				channel = discord.utils.get(member.guild.channels, name='notifications')
-			except:
-				channel = discord.utils.get(member.guild.channels, name='join leave')
-			if channel == None:
-				try:
-					channel = discord.utils.get(member.guild.channels, name='welcome')
-				except:
-					channel = discord.utils.get(member.guild.channels, name='hello goodbye')
-			embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
-			embed.set_thumbnail(url=member.avatar_url)
-			await channel.send(embed=embed)
-	except:
-		print("Attempted to send a join message but failed")
+# @bot.event
+# async def on_member_join(member):
+# 	try:
+# 		if member.bot == False:
+# 			channel=None
+# 			try:
+# 				channel = discord.utils.get(member.guild.channels, name='notifications')
+# 			except:
+# 				channel = discord.utils.get(member.guild.channels, name='join leave')
+# 			if channel == None:
+# 				try:
+# 					channel = discord.utils.get(member.guild.channels, name='welcome')
+# 				except:
+# 					channel = discord.utils.get(member.guild.channels, name='hello goodbye')
+# 			embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
+# 			embed.set_thumbnail(url=member.avatar_url)
+# 			await channel.send(embed=embed)
+# 	except:
+# 		print("Attempted to send a join message but failed")
 
-@bot.event
-async def on_member_remove(member):
-	try:
-		if member.bot == False:
-			channel=None
-			try:
-				channel = discord.utils.get(member.guild.channels, name='notifications')
-			except:
-				channel = discord.utils.get(member.guild.channels, name='join-leave')
-			if channel == None:
-				try:
-					channel = discord.utils.get(member.guild.channels, name='welcome')
-				except:
-					channel = discord.utils.get(member.guild.channels, name='hello-goodbye')
+# @bot.event
+# async def on_member_remove(member):
+# 	try:
+# 		if member.bot == False:
+# 			channel=None
+# 			try:
+# 				channel = discord.utils.get(member.guild.channels, name='notifications')
+# 			except:
+# 				channel = discord.utils.get(member.guild.channels, name='join-leave')
+# 			if channel == None:
+# 				try:
+# 					channel = discord.utils.get(member.guild.channels, name='welcome')
+# 				except:
+# 					channel = discord.utils.get(member.guild.channels, name='hello-goodbye')
 				
-			embed = discord.Embed(title="Member Left", description=member.mention+"("+member.display_name+"#"+member.discriminator+") left the server", color=0xA52A2A)
-			embed.set_thumbnail(url=member.avatar_url)
-			await channel.send(embed=embed)
-	except:
-		print("Attempted to send a removal message but failed")
+# 			embed = discord.Embed(title="Member Left", description=member.mention+"("+member.display_name+"#"+member.discriminator+") left the server", color=0xA52A2A)
+# 			embed.set_thumbnail(url=member.avatar_url)
+# 			await channel.send(embed=embed)
+# 	except:
+# 		print("Attempted to send a removal message but failed")
 
 # load cogs	
 for filename in os.listdir('./cogs'):
