@@ -1,18 +1,3 @@
-# password login
-#from getpass import getpass
-#from os import system
-#code = getpass("Please enter your four digit start up code: ")
-#
-#if code == '2486':
-#	system('clear')
-#	print('\033[93mBooting Discord Bot')
-#	pass
-#else:
-#	exit()
-
-
-
-
 import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
@@ -25,24 +10,18 @@ import os
 import mysql
 import mysql.connector
 
-# ~ from aiohttp import BasicAuth
-# ~ basic_auth = BasicAuth(None, None)
 Bot = discord.Client(shard_count=1)
 bot = commands.Bot(command_prefix='$')
 xp_per_level=1000
 max_XP_per_msg=50
 
+# mydb = mysql.connector.connect(
+# 	host="localhost",
+# 	user="pi",
+# 	passwd=None,
+# 	database="userlevels"
+# )
 
-
-
-
-
-mydb = mysql.connector.connect(
-	host="localhost",
-	user="pi",
-	passwd=None,
-	database="userlevels"
-)
 async def update_status():
 	statuses = ["by myself", "with Boogle", "with Catman311", "PUBG"]
 	#statuses = ["with my dick"]
@@ -255,12 +234,17 @@ async def resetnicknames(ctx):
 	await ctx.send("Nickname reset complete")
 	
 
+@bot.command()
+async def membercount(ctx):
+	await ctx.send(len(ctx.guild.members))
+
 @bot.event
 async def on_command_error(ctx,error):
 	embed=discord.Embed(color=0xf00a3a)
 	embed.add_field(name="Error!", value=error, inline=True)
 
 	await ctx.send(embed=embed)
+
 @bot.event
 async def on_member_join(member):
 	try:
@@ -280,6 +264,7 @@ async def on_member_join(member):
 			await channel.send(embed=embed)
 	except:
 		print("Attempted to send a join message but failed")
+
 @bot.event
 async def on_member_remove(member):
 	try:
@@ -300,6 +285,7 @@ async def on_member_remove(member):
 			await channel.send(embed=embed)
 	except:
 		print("Attempted to send a removal message but failed")
+
 # load cogs	
 for filename in os.listdir('./cogs'):
 	if filename.endswith('.py'):
@@ -322,4 +308,6 @@ async def reloadbot(ctx):
 	embed.title="Reload Complete!"
 	await msg.edit(embed=embed)
 	print("Reload Complete!")
-bot.run('Njg4ODIxNDk2MDgwMzY3NjE5.Xm55Ag.4Shmkvcn_u5mpUM6G-oC60I4Uu8')
+
+
+bot.run('')
