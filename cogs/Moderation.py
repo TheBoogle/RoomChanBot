@@ -30,7 +30,7 @@ class Mod(commands.Cog, ):
 			purged = await ctx.send('Purged '+str(amount)+' messages')
 			await asyncio.sleep(2)
 			await purged.edit(content="a", delete_after=0)
-	@commands.command('Sends an embed')
+	@commands.command(help='Sends an embed')
 	async def embed(self, ctx, title,  *, content):
 		await ctx.channel.purge(limit=1)
 		embed=discord.Embed()

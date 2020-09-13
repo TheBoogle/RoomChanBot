@@ -66,9 +66,8 @@ async def membercount(ctx):
 async def on_command_error(ctx,error):
 	embed=discord.Embed(color=0xf00a3a)
 	embed.add_field(name="Error!", value=error, inline=True)
-
-	await ctx.send(embed=embed)
-
+	await ctx.message.delete()
+	await ctx.send(embed=embed, delete_after=3)
 async def ban(guild, userid, reason):
 	await guild.ban(discord.Object(id=userid), reason=reason)
 
