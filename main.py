@@ -12,7 +12,7 @@ Bot = discord.Client(shard_count=1)
 bot = commands.Bot(command_prefix='$')
 
 async def update_status():
-	statuses = ["by myself", "with Boogle", "with Catman311", "PUBG"]
+	statuses = ["RooM", 'RooM 2', 'Quake', 'DooM']
 	status=0
 	while True:
 		if status == len(statuses)-1:
@@ -79,13 +79,13 @@ async def on_message(ctx):
 	if ctx.content[0:1] != '$' and ctx.author.bot != True:
 		if 'te' in ctx.content and 'room' in ctx.content:
 			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from asking to test RooM 2')
+			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
 		elif 'can' in ctx.content and 'te' in ctx.content:
 			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from asking to test RooM 2')
+			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
 		elif 'want' in ctx.content and 'te' in ctx.content:
 			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from asking to test RooM 2')
+			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
 	await bot.process_commands(ctx)
 # @bot.event
 # async def on_member_join(member):
