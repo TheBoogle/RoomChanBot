@@ -35,12 +35,11 @@ async def on_ready():
 	bot.loop.create_task(update_status())
 
 	
-@bot.command()
+@bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
 @commands.cooldown(1, 120, commands.BucketType.user)
 async def suggest(ctx, *, suggestion):
-	suggestionChannelId = 754864004874371153
+	suggestionChannelId = 754876657898094652
 	suggestionChannel = bot.get_channel(suggestionChannelId)
-
 	embed=discord.Embed(title="User Suggestion", description=suggestion)
 	embed.set_author(name=ctx.author.name+'#'+ctx.author.discriminator, icon_url=ctx.author.avatar_url)
 	msg = await suggestionChannel.send(embed=embed)
@@ -48,6 +47,7 @@ async def suggest(ctx, *, suggestion):
 	await msg.add_reaction('👍')
 	await msg.add_reaction('👎')
 	await ctx.message.delete()
+	await ctx.send('👍 Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
 @commands.has_permissions(manage_nicknames=True)
 async def resetnicknames(ctx):
 	members = ctx.guild.members
