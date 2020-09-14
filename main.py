@@ -34,11 +34,17 @@ async def on_ready():
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
 
-suggestionChannelId = 754864004874371153
-suggestionChannel = bot.get_channel(suggestionChannelId)
+	
 @bot.command()
+@commands.cooldown(1, 120, commands.BucketType.user)
 async def suggest(ctx, *, suggestion):
-	msg = await suggestionChannel.send(ctx.content)
+	suggestionChannelId = 754864004874371153
+	suggestionChannel = bot.get_channel(suggestionChannelId)
+
+	embed=discord.Embed(title="User Suggestion", description=suggestion)
+	embed.set_author(name=ctx.author.name+'#'+ctx.author.discriminator, icon_url=ctx.author.avatar_url)
+	msg = await suggestionChannel.send(embed=embed)
+
 	await msg.add_reaction('👍')
 	await msg.add_reaction('👎')
 	await ctx.message.delete()
