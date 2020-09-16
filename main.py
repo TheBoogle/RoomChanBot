@@ -82,14 +82,14 @@ async def resetnicknames(ctx):
 async def membercount(ctx):
 	await ctx.send("`"+str(len(ctx.guild.members))+"` member's")
 
-# @bot.event
-# async def on_command_error(ctx,error):
-# 	embed=discord.Embed(color=0xf00a3a)
-# 	embed.add_field(name="Error!", value=error, inline=True)
-# 	await ctx.message.delete()
-# 	await ctx.send(embed=embed, delete_after=3)
-# async def ban(guild, userid, reason):
-# 	await guild.ban(discord.Object(id=userid), reason=reason)
+@bot.event
+async def on_command_error(ctx,error):
+	embed=discord.Embed(color=0xf00a3a)
+	embed.add_field(name="Error!", value=error, inline=True)
+	await ctx.message.delete()
+	await ctx.send(embed=embed, delete_after=3)
+async def ban(guild, userid, reason):
+	await guild.ban(discord.Object(id=userid), reason=reason)
 
 @bot.event
 async def on_message(ctx):
@@ -129,7 +129,7 @@ async def on_message(ctx):
 			mydb.commit()
 	await bot.process_commands(ctx)
 xp_per_level = 1000
-@bot.command()
+@bot.command(aliases=['lvl','xp','exp'])
 async def level(ctx, user: discord.User=None):
 	if user == None:
 		user = ctx.author
