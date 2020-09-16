@@ -129,39 +129,44 @@ async def on_message(ctx):
 			mydb.commit()
 	await bot.process_commands(ctx)
 xp_per_level = 1000
-@bot.command(aliases=['lvl','xp','exp'])
+@bot.command(aliases=['lvl','xp','exp', 'rank'])
 async def level(ctx, user: discord.User=None):
 	if user == None:
 		user = ctx.author
+	try:
+		cursor = mydb.cursor()
+		cursor.execute("SELECT user_xp FROM users WHERE client_id = "+str(user.id))
+		result = cursor.fetchall()
+		xp=result[0][0]
+		embed = discord.Embed(title=user.name+"#"+user.discriminator, color=user.color)
+		level_number = int(result[0][0]) // xp_per_level
+		embed.add_field(name="LVL", value = str(level_number))
+		totalxp=xp
+		cursor.execute('SET @row_number=0')
+		cursor.execute("SELECT (@row_number:=@row_number + 1) AS num, client_id, user_xp FROM users ORDER BY user_xp DESC")
+		result3 = cursor.fetchall()
+		i=0
+		found=False
+		while i < len(result3):
 
-	cursor = mydb.cursor()
-	cursor.execute("SELECT user_xp FROM users WHERE client_id = "+str(user.id))
-	result = cursor.fetchall()
-	xp=result[0][0]
-	embed = discord.Embed(title=user.name+"#"+user.discriminator, color=user.color)
-	level_number = int(result[0][0]) // xp_per_level
-	embed.add_field(name="LVL", value = str(level_number))
-	totalxp=xp
-	cursor.execute('SET @row_number=0')
-	cursor.execute("SELECT (@row_number:=@row_number + 1) AS num, client_id, user_xp FROM users ORDER BY user_xp DESC")
-	result3 = cursor.fetchall()
-	i=0
-	found=False
-	while i < len(result3):
+			if result3[i][1] == user.id:
+				
+				embed.add_field(name="GLOBAL RANK", value="Rank #"+str(result3[i][0])+" / "+str(len(result3)))
+				found=True
+				break
+			i=i+1
+		i=0
+		while i < level_number:
+			xp=xp-xp_per_level
+			i=i+1
+		embed.add_field(name="XP", value = str(xp)+"/"+str(xp_per_level))
+		embed.add_field(name="Total XP", value = str(totalxp))
+		await ctx.send(embed=embed)
+	except:
+		embed=discord.Embed(color=0xf00a3a)
+		embed.add_field(name="Error!", value="That user is not in the database!", inline=True)
 
-		if result3[i][1] == user.id:
-			
-			embed.add_field(name="GLOBAL RANK", value="Rank #"+str(result3[i][0])+" / "+str(len(result3)))
-			found=True
-			break
-		i=i+1
-	i=0
-	while i < level_number:
-		xp=xp-xp_per_level
-		i=i+1
-	embed.add_field(name="XP", value = str(xp)+"/"+str(xp_per_level))
-	embed.add_field(name="Total XP", value = str(totalxp))
-	await ctx.send(embed=embed)
+		await ctx.send(embed=embed)
 @bot.command(aliases=["top", "leader"])
 async def leaderboard(ctx, lines:int=None):
 	cursor = mydb.cursor()
