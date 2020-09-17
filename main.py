@@ -10,7 +10,7 @@ import os
 import mysql
 import mysql.connector
 from profanityfilter import ProfanityFilter
-pf = ProfanityFilter(custom_censor_list={'sex', 'cum', 'nigga', 'nigger',''})
+pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger',''})
 
 
 
