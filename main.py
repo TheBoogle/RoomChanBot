@@ -9,6 +9,9 @@ import aiohttp
 import os
 import mysql
 import mysql.connector
+from profanityfilter import ProfanityFilter
+pf = ProfanityFilter(custom_censor_list={'sex', 'cum', 'nigga', 'nigger',''})
+
 
 
 mydb = mysql.connector.connect(
@@ -98,22 +101,16 @@ async def on_message(ctx):
 	if ctx.content.lower()[0:1] != '$' and ctx.author.bot != True:
 		if 'tes' in ctx.content.lower() and 'room' in ctx.content.lower():
 			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
+			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing', delete_after=6)
 		elif 'can' in ctx.content.lower() and 'tes' in ctx.content.lower():
 			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
+			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing', delete_after=6)
 		elif 'want' in ctx.content.lower() and 'tes' in ctx.content.lower():
 			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing')
-		elif 'sex' in ctx.content.lower():
+			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing', delete_after=6)
+		elif pf.is_profane(ctx.content.lower()) == True:
 			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from using that language')
-		elif 'cum' in ctx.content.lower():
-			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from using that language')
-		elif 'secks' in ctx.content.lower():
-			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from using that language')
+			await ctx.channel.send(author.mention+' Please refrain from using that language `'+pf.censor(ctx.content)+'`', delete_after=6)
 
 	if ctx.author.bot == False and ctx.content[0:1] != "$" and len(ctx.content) > 1:
 		xp = generateXP()
