@@ -7,7 +7,6 @@ import random
 import asyncio
 import aiohttp
 import os
-import mysql
 import mysql.connector
 from profanityfilter import ProfanityFilter
 pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger',''})
@@ -97,6 +96,10 @@ async def ban(guild, userid, reason):
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
+	if ctx.channel.id == 762540670836670504:
+		if ctx.content != 'Caleb':
+			await ctx.delete()
+			await ctx.author.send('Are you stupid!? You can only say `Caleb` in #caleb >:(')
 	if ctx.content.lower()[0:1] != '$' and ctx.author.bot != True:
 		if 'tes' in ctx.content.lower() and 'room' in ctx.content.lower():
 			await ctx.delete()
