@@ -28,6 +28,20 @@ bot = commands.Bot(command_prefix='$')
 def generateXP():
 	return random.randrange(250,500)
 
+@bot.command()
+@commands.is_owner()
+async def setlevel(ctx, member:discord.User=None, level: int=None):
+	cursor = mydb.cursor()
+	try:
+		cursor.execute("UPDATE users SET user_xp = "+ str(xp_per_level*level)+" WHERE client_id = " +str(member.id))
+		await ctx.send("Set "+member.mention+"'s level to `"+str(level)+"`")
+	except:
+		embed=discord.Embed(color=0xf00a3a)
+		embed.add_field(name="Error!", value="Either level is too high, or user is not in database", inline=True)
+
+		await ctx.send(embed=embed)
+	mydb.commit()
+
 
 async def update_status():
 	statuses = ["RooM", 'RooM 2', 'Quake', 'DooM']
