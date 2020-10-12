@@ -26,7 +26,7 @@ bot = commands.Bot(command_prefix='$')
 
 
 def generateXP():
-	return random.randrange(1,50)
+	return random.randrange(250,500)
 
 
 async def update_status():
