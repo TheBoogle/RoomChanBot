@@ -43,8 +43,7 @@ class Music(commands.Cog):
             try:    
                 vc = await radio_channel.connect()
             except:
-                await ctx.channel.send("A song is already playing")
-                return
+                pass
             
            
             vc.play(discord.FFmpegPCMAudio("song.wav"))
