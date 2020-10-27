@@ -45,37 +45,15 @@ class Music(commands.Cog):
             except:
                 await ctx.channel.send("A song is already playing")
                 return
-
-
-            for file in os.listdir("./"):
-                if file.endswith(".wav"):
-                    os.remove(file)
             
-            await ctx.channel.send('Downloading & Converting file... This will take a few seconds.')
-            
-            try:
-                
-                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                
-                    ydl.download([list(playlist)[i]])
-                    
-                for file in os.listdir("./"):
-                    if file.endswith(".wav"):
-                        os.rename(file, 'song.wav')
-                try:
-                    vc.play(discord.FFmpegPCMAudio("song.wav"))
-                    await ctx.channel.send('Playing.')
-                   
-                    f = sf.SoundFile('song.wav')
-                    print(len(f) / f.samplerate)
-                    await asyncio.sleep(len(f) / f.samplerate)
-                    await vc.disconnect()
-                
-                except:
-                    await ctx.channel.send("A song is already playing")
-            except:
-                await ctx.channel.send("This song can't be played due to DMCA")
-                await vc.disconnect()
+           
+            vc.play(discord.FFmpegPCMAudio("song.wav"))
+
+           
+            f = sf.SoundFile('song.wav')
+
+            await asyncio.sleep(len(f) / f.samplerate)
+
                 
             
             
