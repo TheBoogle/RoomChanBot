@@ -16,7 +16,7 @@ class Fun(commands.Cog):
 	print("\033[92mLoading Fun Cog\033[0m")
 	
 	@commands.command(help='Tells CanyonJack roomchan loves him')
-	@commands.cooldown(1, 500, commands.BucketType.guild)
+	@commands.cooldown(1, 1000, commands.BucketType.guild)
 	async def dmcanyon(self, ctx):
 		user = await self.bot.fetch_user(524686319004155924)
 		try:
@@ -24,7 +24,15 @@ class Fun(commands.Cog):
 			await ctx.channel.send("Your love message was sent!")
 		except:
 			await ctx.channel.send("An error occured while sending this message, he may have blocked Room Chan")
-	
+	@commands.command(help='Tells PoptartNoahh "poopfartnoahh" ')
+	@commands.cooldown(1, 1000, commands.BucketType.guild)
+	async def dmpoptartnoahh(self, ctx):
+		user = await self.bot.fetch_user(281922284216909824)
+		try:
+			await user.send('poopfartnoahh xd')
+			await ctx.channel.send("Your hate message was sent!")
+		except:
+			await ctx.channel.send("An error occured while sending this message, he may have blocked Room Chan")
 	@commands.command(help='I love me some bread')
 	async def baguette(self, ctx, member:discord.User=None):
 		if member == None:
