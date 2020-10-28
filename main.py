@@ -21,12 +21,12 @@ mydb = mysql.connector.connect(
 
 )
 
-Bot = discord.Client(shard_count=1)
+Bot = discord.Client()
 bot = commands.Bot(command_prefix='$')
 
 
 def generateXP():
-	return random.randrange(250,500)
+	return random.randrange(25,50)
 
 @bot.command()
 @commands.is_owner()
@@ -110,6 +110,10 @@ async def ban(guild, userid, reason):
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
+	if not ctx.guild and not author.bot:
+		user = await bot.fetch_user(643491766926049318)
+		await user.send(str(ctx.author) + ": " + ctx.content)
+		
 	if ctx.channel.id == 762540670836670504:
 		if ctx.content != 'Caleb':
 			await ctx.delete()
@@ -127,7 +131,7 @@ async def on_message(ctx):
 		elif pf.is_profane(ctx.content.lower()) == True:
 			await ctx.delete()
 			await ctx.channel.send(author.mention+' Please refrain from using that language `'+pf.censor(ctx.content)+'`', delete_after=6)
-
+    
 	if ctx.author.bot == False and ctx.content[0:1] != "$" and len(ctx.content) > 1:
 		xp = generateXP()
 		cursor = mydb.cursor()
@@ -135,11 +139,11 @@ async def on_message(ctx):
 		result = cursor.fetchall()
 		if len(result) == 0:
 			cursor.execute("INSERT INTO users VALUES(" + str(ctx.author.id) + "," + str(xp) + ')')
-			mydb.commit()
 		else:
 			currentXP = result[0][0] + xp
 			cursor.execute("UPDATE users SET user_xp = "+ str(currentXP)+" WHERE client_id = " +str(ctx.author.id))
-			mydb.commit()
+		mydb.commit()
+        
 	await bot.process_commands(ctx)
 xp_per_level = 1000
 @bot.command(aliases=['lvl','xp','exp', 'rank'])
@@ -191,7 +195,7 @@ async def leaderboard(ctx, lines:int=None):
 	if lines == None:
 		lines = len(result)
 		if lines > 10:
-			lines = 25
+			lines = 10
 			
 	i=0
 	if i < 0: 
@@ -199,15 +203,20 @@ async def leaderboard(ctx, lines:int=None):
 	runs=1
 	if lines > len(result):
 		lines = len(result)
-	print(i)
-	while i < lines:
-		member = bot.get_user(result2[i][0])
-		if bot.get_user(result2[i][0]) == None:
-			cursor.execute("DELETE FROM users WHERE client_id = "+str(result2[i][0]))
-		else:
-			embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), inline=False, value="Level: "+str(result[i][0]//xp_per_level)+" Total XP: "+str(result[i][0]))
-			runs=runs+1
-		i=i+1
+
+	async with ctx.channel.typing():
+		while i < lines:
+
+			
+			member = await bot.fetch_user(result2[i][0])
+
+			if member == None:
+				pass
+			else:
+				embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), inline=False, value="Level: "+str(result[i][0]//xp_per_level)+" Total XP: "+str(result[i][0]))
+				runs=runs+1
+			i=i+1
+
 	cursor.execute("SET @row_number = 0")
 	cursor.execute("SELECT (@row_number:=@row_number + 1) AS num, client_id, user_xp FROM users ORDER BY user_xp DESC")
 	result3 = cursor.fetchall()
