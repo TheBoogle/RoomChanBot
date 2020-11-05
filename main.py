@@ -66,15 +66,6 @@ async def on_ready():
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
 
-	channel = bot.get_channel(531310166662971422)
-
-	member = channel.guild.get_member(754770852796694652)
-
-	embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
-	embed.set_thumbnail(url=member.avatar_url)
-	await channel.send(embed=embed)
-	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
-
 
 @bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
 @commands.cooldown(1, 120, commands.BucketType.user)
@@ -85,10 +76,10 @@ async def suggest(ctx, *, suggestion):
 	embed.set_author(name=ctx.author.name+'#'+ctx.author.discriminator, icon_url=ctx.author.avatar_url)
 	msg = await suggestionChannel.send(embed=embed)
 
-	await msg.add_reaction('👍')
-	await msg.add_reaction('👎')
+	await msg.add_reaction('ðŸ‘')
+	await msg.add_reaction('ðŸ‘Ž')
 	await ctx.message.delete()
-	await ctx.send('👍 Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
+	await ctx.send('ðŸ‘ Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
 @commands.has_permissions(manage_nicknames=True)
 async def resetnicknames(ctx):
 	members = ctx.guild.members
@@ -255,7 +246,7 @@ async def on_member_remove(member):
 	embed = discord.Embed(title="Member Left", description=member.mention+" left the server", color=0xA52A2A)
 	embed.set_thumbnail(url=member.avatar_url)
 	await channel.send(embed=embed)
-	await channel.edit(name = 'Member count:{}'.format(channel.guild.member_count))
+	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
 # load cogs	
 for filename in os.listdir('./cogs'):
 	if filename.endswith('.py'):
