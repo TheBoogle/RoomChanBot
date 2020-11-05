@@ -66,6 +66,16 @@ async def on_ready():
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
 
+	channel = bot.get_channel(531310166662971422)
+
+	member = channel.guild.get_member(754770852796694652)
+
+	embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
+	embed.set_thumbnail(url=member.avatar_url)
+	await channel.send(embed=embed)
+	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
+
+
 @bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
 @commands.cooldown(1, 120, commands.BucketType.user)
 async def suggest(ctx, *, suggestion):
@@ -113,7 +123,6 @@ async def on_message(ctx):
 	if not ctx.guild and not author.bot:
 		user = await bot.fetch_user(643491766926049318)
 		await user.send(str(ctx.author) + ": " + ctx.content)
-		
 	if ctx.channel.id == 762540670836670504:
 		if ctx.content != 'Caleb':
 			await ctx.delete()
@@ -229,47 +238,24 @@ async def leaderboard(ctx, lines:int=None):
 			break
 		i=i+1
 	await ctx.send(embed=embed)
-# @bot.event
-# async def on_member_join(member):
-	# try:
-		# if member.bot == False:
-			# channel=None
-			# try:
-				# channel = discord.utils.get(member.guild.channels, name='notifications')
-			# except:
-				# channel = discord.utils.get(member.guild.channels, name='join leave')
-			# if channel == None:
-				# try:
-					# channel = discord.utils.get(member.guild.channels, name='welcome')
-				# except:
-					# channel = discord.utils.get(member.guild.channels, name='hello goodbye')
-			# embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
-			# embed.set_thumbnail(url=member.avatar_url)
-			# await channel.send(embed=embed)
-	# except:
-		# print("Attempted to send a join message but failed")
+@bot.event
+async def on_member_join(member):
+	channel = bot.get_channel(531310166662971422)
 
-# @bot.event
-# async def on_member_remove(member):
-	# try:
-		# if member.bot == False:
-			# channel=None
-			# try:
-				# channel = discord.utils.get(member.guild.channels, name='notifications')
-			# except:
-				# channel = discord.utils.get(member.guild.channels, name='join-leave')
-			# if channel == None:
-				# try:
-					# channel = discord.utils.get(member.guild.channels, name='welcome')
-				# except:
-					# channel = discord.utils.get(member.guild.channels, name='hello-goodbye')
-				
-			# embed = discord.Embed(title="Member Left", description=member.mention+"("+member.display_name+"#"+member.discriminator+") left the server", color=0xA52A2A)
-			# embed.set_thumbnail(url=member.avatar_url)
-			# await channel.send(embed=embed)
-	# except:
-		# print("Attempted to send a removal message but failed")
 
+	embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
+	embed.set_thumbnail(url=member.avatar_url)
+	await channel.send(embed=embed)
+	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
+@bot.event
+async def on_member_remove(member):
+	channel = bot.get_channel(531310166662971422)
+
+	print(channel.name)
+	embed = discord.Embed(title="Member Left", description=member.mention+" left the server", color=0xA52A2A)
+	embed.set_thumbnail(url=member.avatar_url)
+	await channel.send(embed=embed)
+	await channel.edit(name = 'Member count:{}'.format(channel.guild.member_count))
 # load cogs	
 for filename in os.listdir('./cogs'):
 	if filename.endswith('.py'):

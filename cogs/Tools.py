@@ -17,7 +17,12 @@ class Tools(commands.Cog):
 		await ctx.send('`Pong! {0}ms`'.format(round(self.bot.latency, 2)))
 		
 	@commands.command(help='Countsdown from desired time')
+	@commands.cooldown(1,120, commands.BucketType.guild)
 	async def countdown(self, ctx, seconds: int=10):
+		if seconds >= 120:
+			await ctx.channel.send("Countdown time must be less then 120 seconds")
+			return
+
 		embed=discord.Embed(title="Countdown", description=str(seconds)+" seconds remaining...")
 		msg = await ctx.send(embed=embed)
 		i=0

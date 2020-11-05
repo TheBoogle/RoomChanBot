@@ -24,7 +24,7 @@ ydl_opts = {
 
 vc = None
 playlist = {
-    "https://www.youtube.com/watch?v=1qN72LEQnaU"
+    "song.wav"
 }
 class Music(commands.Cog):
     def __init__(self, bot):
