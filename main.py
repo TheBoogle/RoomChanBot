@@ -1,4 +1,6 @@
 import discord
+intents = discord.Intents(messages=True, guilds=True, members=True)
+intents.members = True
 from discord.ext.commands import Bot
 from discord.ext import commands
 from discord.ext import tasks
@@ -22,7 +24,7 @@ mydb = mysql.connector.connect(
 )
 
 Bot = discord.Client()
-bot = commands.Bot(command_prefix='$')
+bot = commands.Bot(command_prefix='$', intents = intents, chunk_guilds_at_startup=True)
 
 
 def generateXP():
@@ -57,7 +59,26 @@ async def update_status():
 			sum += len(guild.members)
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
 		await asyncio.sleep(10)
-		
+
+@bot.event
+async def on_member_join(member):
+	channel = member.guild.get_channel(531310166662971422)
+
+
+
+	embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
+	embed.set_thumbnail(url=member.avatar_url)
+	await channel.send(embed=embed)
+	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
+@bot.event
+async def on_member_remove(member):
+	channel = member.guild.get_channel(531310166662971422)
+
+
+	embed = discord.Embed(title="Member Left", description=member.mention+" left the server", color=0xA52A2A)
+	embed.set_thumbnail(url=member.avatar_url)
+	await channel.send(embed=embed)
+	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
 
 @bot.event
 async def on_ready():
@@ -229,24 +250,7 @@ async def leaderboard(ctx, lines:int=None):
 			break
 		i=i+1
 	await ctx.send(embed=embed)
-@bot.event
-async def on_member_join(member):
-	channel = bot.get_channel(531310166662971422)
 
-
-	embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
-	embed.set_thumbnail(url=member.avatar_url)
-	await channel.send(embed=embed)
-	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
-@bot.event
-async def on_member_remove(member):
-	channel = bot.get_channel(531310166662971422)
-
-	print(channel.name)
-	embed = discord.Embed(title="Member Left", description=member.mention+" left the server", color=0xA52A2A)
-	embed.set_thumbnail(url=member.avatar_url)
-	await channel.send(embed=embed)
-	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
 # load cogs	
 for filename in os.listdir('./cogs'):
 	if filename.endswith('.py'):
