@@ -1,6 +1,4 @@
 import discord
-intents = discord.Intents(messages=True, guilds=True, members=True)
-intents.members = True
 from discord.ext.commands import Bot
 from discord.ext import commands
 from discord.ext import tasks
@@ -24,7 +22,8 @@ mydb = mysql.connector.connect(
 )
 
 Bot = discord.Client()
-bot = commands.Bot(command_prefix='$', intents = intents, chunk_guilds_at_startup=True)
+bot = commands.Bot(command_prefix='$', intents = discord.Intents.all(), chunk_guilds_at_startup=True)
+
 
 
 def generateXP():
@@ -46,7 +45,7 @@ async def setlevel(ctx, member:discord.User=None, level: int=None):
 
 
 async def update_status():
-	statuses = ["RooM", 'RooM 2', 'Quake', 'DooM']
+	statuses = ["RooM", 'RooM 2', 'Quake', 'DooM', "DooM 2", "Wolfenstein 3D", "Quake 2", "Doom VFR", "Plutoina Experiment"]
 	status=0
 	while True:
 		if status == len(statuses)-1:
@@ -58,7 +57,7 @@ async def update_status():
 		for guild in guilds:
 			sum += len(guild.members)
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
-		await asyncio.sleep(10)
+		await asyncio.sleep(120)
 
 @bot.event
 async def on_member_join(member):
@@ -97,10 +96,10 @@ async def suggest(ctx, *, suggestion):
 	embed.set_author(name=ctx.author.name+'#'+ctx.author.discriminator, icon_url=ctx.author.avatar_url)
 	msg = await suggestionChannel.send(embed=embed)
 
-	await msg.add_reaction('ðŸ‘')
-	await msg.add_reaction('ðŸ‘Ž')
+	await msg.add_reaction('👍')
+	await msg.add_reaction('👎')
 	await ctx.message.delete()
-	await ctx.send('ðŸ‘ Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
+	await ctx.send('👍 Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
 @commands.has_permissions(manage_nicknames=True)
 async def resetnicknames(ctx):
 	members = ctx.guild.members
