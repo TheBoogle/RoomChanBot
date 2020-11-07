@@ -15,6 +15,12 @@ class Fun(commands.Cog):
 	
 	print("\033[92mLoading Fun Cog\033[0m")
 	
+	@commands.command(help='Command is exclusive to Ciba')
+	async def ciba(self, ctx):
+		if int(ctx.author.id) == 516713042558320664:
+			await ctx.send(":point_down: Gay :flushed: :point_down:")
+		else:
+			await ctx.send(":point_up: Gay :flushed: :point_up:")
 	@commands.command(help='Tells CanyonJack roomchan loves him')
 	@commands.cooldown(1, 1000, commands.BucketType.guild)
 	async def dmcanyon(self, ctx):

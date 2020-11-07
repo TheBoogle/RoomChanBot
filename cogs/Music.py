@@ -39,11 +39,10 @@ class Music(commands.Cog):
         print(list(playlist)[i])
         while True:
             radio_channel = self.bot.get_channel(770719723851612170)
+		
+    
+            vc = await radio_channel.connect()
 
-            try:    
-                vc = await radio_channel.connect()
-            except:
-                pass
             
            
             vc.play(discord.FFmpegPCMAudio("song.wav"))

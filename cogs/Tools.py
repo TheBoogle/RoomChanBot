@@ -12,9 +12,35 @@ class Tools(commands.Cog):
 		self.bot = bot
 	
 	print("\033[92mLoading Tools Cog\033[0m")
+	
+	@commands.command(help='Outputs all server emojis')
+	@commands.cooldown(1,240, commands.BucketType.guild)
+	async def fetchemojis(self, ctx):
+	
+		emojis = await ctx.guild.fetch_emojis()
+		message = ""
+		
+		for emoji in emojis:
+			message = message + str(emoji)
+			
+			if len(message) > 1500:
+				await ctx.send(message)
+				message = ""
+		await ctx.send(message)
+		
+	@commands.command(help='Sends you a list of all the members')
+	async def getmembers(self, ctx):
+		async with ctx.typing():
+			f = open("memberlist.txt","w")
+			x = ctx.guild.members
+			for member in x:
+				f.write(member.name+"#"+member.discriminator+"\n")
+			f.close()
+			await ctx.send("`Check your DMs` "+ctx.author.mention, delete_after=5)
+			await ctx.author.send(file=discord.File('memberlist.txt'))
 	@commands.command(help='Pings the bots latency')
 	async def ping(self, ctx):
-		await ctx.send('`Pong! {0}ms`'.format(round(self.bot.latency, 2)))
+		await ctx.send(f'Pong! {self.bot.latency}')
 		
 	@commands.command(help='Countsdown from desired time')
 	@commands.cooldown(1,120, commands.BucketType.guild)
@@ -64,13 +90,7 @@ class Tools(commands.Cog):
 		embed = discord.Embed(title=member.name+"#"+member.discriminator+"'s avatar")
 		embed.set_image(url=member.avatar_url)
 		await ctx.send(embed=embed)
-	@commands.command(help='Outputs all server emojis')
-	async def fetchemojis(self, ctx):
-		emojis = await ctx.guild.fetch_emojis()
-		message = ""
-		for emoji in emojis:
-			message = message + str(emoji)
-		await ctx.send(message)
+	
 	@commands.command(help='Gets you info on a server', aliases=['aboutserver'])
 	async def serverinfo(self, ctx):
 		roles = [role for role in ctx.guild.roles]
