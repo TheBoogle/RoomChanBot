@@ -12,8 +12,13 @@ import mysql.connector
 from autocorrect import Speller
 from profanityfilter import ProfanityFilter
 pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger'})
+
+minimum_age = 30
+xp_per_level = 1000
+
 bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
 
+statuses = ["RooM", 'RooM 2', 'Quake', 'DooM', "DooM 2", "Wolfenstein 3D", "Quake 2", "Doom VFR", "Plutoina Experiment"]
 
 mydb = mysql.connector.connect(
 	host="localhost",
@@ -25,8 +30,6 @@ mydb = mysql.connector.connect(
 
 Bot = discord.Client()
 bot = commands.Bot(command_prefix='$', intents = discord.Intents.all(), chunk_guilds_at_startup=True)
-
-
 
 def generateXP():
 	return random.randrange(25,50)
@@ -45,9 +48,8 @@ async def setlevel(ctx, member:discord.User=None, level: int=None):
 		await ctx.send(embed=embed)
 	mydb.commit()
 
-
 async def update_status():
-	statuses = ["RooM", 'RooM 2', 'Quake', 'DooM', "DooM 2", "Wolfenstein 3D", "Quake 2", "Doom VFR", "Plutoina Experiment"]
+	random.shuffle(statuses)
 	status=0
 	while True:
 		if status == len(statuses)-1:
@@ -61,7 +63,6 @@ async def update_status():
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
 		await asyncio.sleep(120)
 
-minimum_age = 30
 @bot.event
 async def on_member_join(member):
 	channel = member.guild.get_channel(531310166662971422)
@@ -71,7 +72,6 @@ async def on_member_join(member):
 	
 	age = datetime.now().timestamp() - member.created_at.timestamp()
 	
-	
 	print(age)
 	if age < minimum_age*86400:
 		embed=discord.Embed(color=0xf00a3a)
@@ -80,11 +80,6 @@ async def on_member_join(member):
 		await member.guild.kick(member)
 	else:
 		await channel.send(embed=embed)
-	
-	
-
-	
-	
 	
 	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
 @bot.event
@@ -104,7 +99,6 @@ async def on_ready():
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
 	
-
 @bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
 @commands.cooldown(1, 120, commands.BucketType.user)
 async def suggest(ctx, *, suggestion):
@@ -118,6 +112,7 @@ async def suggest(ctx, *, suggestion):
 	await msg.add_reaction('👎')
 	await ctx.message.delete()
 	await ctx.send('👍 Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
+
 @commands.has_permissions(manage_nicknames=True)
 async def resetnicknames(ctx):
 	members = ctx.guild.members
@@ -130,7 +125,6 @@ async def resetnicknames(ctx):
 			print('error changing '+member.name+"#"+member.discriminator)
 	print("Nickname reset complete")
 	await ctx.send("Nickname reset complete")
-	
 
 @bot.command()
 async def membercount(ctx):
@@ -142,29 +136,22 @@ async def on_command_error(ctx,error):
 	embed.add_field(name="Error!", value=error, inline=True)
 	await ctx.message.delete()
 	await ctx.send(embed=embed, delete_after=3)
+	
 async def ban(guild, userid, reason):
 	await guild.ban(discord.Object(id=userid), reason=reason)
-
-
-spell = Speller(lang='en')
 
 @bot.event
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
-	
-	
-	
-	
+
 	attach = ctx.attachments
 	staffChannel = await bot.fetch_channel(722148701753311332)
-	
-	
 	
 	if len(attach) > 0:
 		for attachment in attach:
 			for banned in bannedFileTypes:
-				if attachment.filename.lower().endswith('.'+banned):
+				if attachment.filename.lower().endswith('.'+banned.lower()):
 					await ctx.delete()
 					await ctx.channel.send(f"{ctx.author.mention} no {banned.upper()} file types allowed!")
 					await staffChannel.send(ctx.author.mention + f" sent a {banned.upper()} File")
@@ -227,7 +214,7 @@ async def on_message(ctx):
 		mydb.commit()
         
 	await bot.process_commands(ctx)
-xp_per_level = 1000
+
 @bot.command(aliases=['lvl','xp','exp', 'rank'])
 async def level(ctx, user: discord.User=None):
 	if user == None:
