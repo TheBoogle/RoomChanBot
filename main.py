@@ -3,6 +3,7 @@ from discord.ext.commands import Bot
 from discord.ext import commands
 from discord.ext import tasks
 from discord.ext.tasks import loop
+from datetime import datetime, timedelta
 import random
 import asyncio
 import aiohttp
@@ -59,15 +60,31 @@ async def update_status():
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
 		await asyncio.sleep(120)
 
+minimum_age = 30
 @bot.event
 async def on_member_join(member):
 	channel = member.guild.get_channel(531310166662971422)
-
-
-
+	
 	embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
 	embed.set_thumbnail(url=member.avatar_url)
-	await channel.send(embed=embed)
+	
+	age = datetime.now().timestamp() - member.created_at.timestamp()
+	
+	
+	print(age)
+	if age < minimum_age*86400:
+		embed=discord.Embed(color=0xf00a3a)
+		embed.add_field(name="You were kicked!", value=f"You have been kicked in {member.guild.name} for: `Your account must be {minimum_age} days or older to join.`", inline=True)
+		await member.send(embed=embed)
+		await member.guild.kick(member)
+	else:
+		await channel.send(embed=embed)
+	
+	
+
+	
+	
+	
 	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
 @bot.event
 async def on_member_remove(member):
@@ -85,7 +102,7 @@ async def on_ready():
 	# ~ print('\033[92mConnected to proxy:{0.proxy}.'.format(Bot)+"\033[0m")
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
-
+	
 
 @bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
 @commands.cooldown(1, 120, commands.BucketType.user)
@@ -131,9 +148,24 @@ async def ban(guild, userid, reason):
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
+	
+	attach = ctx.attachments
+	staffChannel = await bot.fetch_channel(722148701753311332)
+	if len(attach) > 0:
+		for attachment in attach:
+			if attachment.filename.lower().endswith('.dll'):
+				await ctx.delete()
+				await ctx.channel.send(ctx.author.mention + " No DLL Files Allowed!")
+				await staffChannel.send(ctx.author.mention + " sent a DLL File")
+			elif attachment.filename.lower().endswith('.exe'):
+				await ctx.delete()
+				await ctx.channel.send(ctx.author.mention + " No EXE Files Allowed!")
+				await staffChannel.send(ctx.author.mention + " sent a EXE File")
+	
 	if not ctx.guild and not author.bot:
 		user = await bot.fetch_user(643491766926049318)
 		await user.send(str(ctx.author) + ": " + ctx.content)
+		return
 	if ctx.channel.id == 762540670836670504:
 		if ctx.content != 'Caleb':
 			await ctx.delete()

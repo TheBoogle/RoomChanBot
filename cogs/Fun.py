@@ -133,11 +133,15 @@ class Fun(commands.Cog):
 			await ctx.send(member.mention+"'s pp: "+sizes[len(sizes)-1])
 		elif int(member.id) == 626879247876751380:
 			await ctx.send(member.mention+"'s pp: "+sizes[0])
+		elif int(member.id) == 748287469643890719:
+			await ctx.send(member.mention+"'s pp: {(.)}")
 		# ~ elif int(member.id) == 460040394999332885:
 			# ~ await ctx.send(member.display_name+"'s pp: () something about thats not right...")
 			
 		else:
+			random.seed(a=member.id)
 			await ctx.send(member.mention+"'s pp: "+random.choice(sizes))
+			random.seed(a=None)
 	@commands.command(aliases=["rr"], help='Hidden rickroll in an embed')
 	async def rickroll(self,ctx,*,message):
 		await ctx.channel.purge(limit=1)
