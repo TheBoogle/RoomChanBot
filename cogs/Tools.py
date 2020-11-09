@@ -1,3 +1,4 @@
+from __future__ import print_function
 import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
@@ -5,6 +6,14 @@ import random
 import asyncio
 import aiohttp
 import os
+from pyspectator.computer import Computer
+from pyspectator.processor import Cpu
+from gpiozero import CPUTemperature
+
+
+import psutil
+
+
 
 class Tools(commands.Cog):
 	
@@ -13,6 +22,25 @@ class Tools(commands.Cog):
 	
 	print("\033[92mLoading Tools Cog\033[0m")
 	
+	@commands.command(help='Gets Room Chan Information')
+	async def botstats(self, ctx):
+		async with ctx.channel.typing():
+			computer = Computer()
+			embed = embed=discord.Embed(title='Bot Stats', description='Information on the Room Chan Bots computer', color=0xff5500)
+			embed.add_field(name="Operating System", value=computer.os)
+			embed.add_field(name="Python Version", value=computer.python_version)
+			embed.add_field(name="Computer Uptime", value=computer.uptime)
+			embed.add_field(name="Processor Name", value=computer.processor.name)
+			cpu = Cpu(monitoring_latency=1)
+			await asyncio.sleep(1.1)
+			with cpu:
+				embed.add_field(name='CPU Usage', value = str(cpu.load)+"%")
+			cpu = CPUTemperature()
+			embed.add_field(name='CPU Temperature', value = f"{cpu.temperature}°C / {(cpu.temperature * (9/5)) + 32}°F")
+			embed.add_field(name='RAM Usage', value = str(psutil.virtual_memory().percent)+"%")
+			
+			await ctx.send(embed=embed)
+			
 	@commands.command(help='Outputs all server emojis')
 	@commands.cooldown(1,240, commands.BucketType.guild)
 	async def fetchemojis(self, ctx):

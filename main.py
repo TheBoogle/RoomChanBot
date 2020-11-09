@@ -18,7 +18,7 @@ xp_per_level = 1000
 
 bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
 
-statuses = ["RooM", 'RooM 2', 'Quake', 'DooM', "DooM 2", "Wolfenstein 3D", "Quake 2", "Doom VFR", "Plutoina Experiment"]
+statuses = ["github/TheBoogle/RoomChanBot"]
 
 mydb = mysql.connector.connect(
 	host="localhost",
@@ -29,7 +29,7 @@ mydb = mysql.connector.connect(
 )
 
 Bot = discord.Client()
-bot = commands.Bot(command_prefix='$', intents = discord.Intents.all(), chunk_guilds_at_startup=True)
+bot = commands.Bot(command_prefix='$', shard_count = 1, intents = discord.Intents.all(), chunk_guilds_at_startup=True)
 
 def generateXP():
 	return random.randrange(25,50)

@@ -7,6 +7,7 @@ import aiohttp
 import os
 maxSpam = 20
 maxPurge = 500
+
 class Mod(commands.Cog, ):
 	
 	def __init__(self, bot):
