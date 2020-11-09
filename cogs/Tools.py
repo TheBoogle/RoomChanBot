@@ -9,11 +9,13 @@ import os
 from pyspectator.computer import Computer
 from pyspectator.processor import Cpu
 from gpiozero import CPUTemperature
-
+from py_expression_eval import Parser
 
 import psutil
+import datetime
 
-
+parser = Parser()
+variables = {'X':datetime.datetime.now().timestamp(),'x':datetime.datetime.now().timestamp()}
 
 class Tools(commands.Cog):
 	
@@ -21,6 +23,42 @@ class Tools(commands.Cog):
 		self.bot = bot
 	
 	print("\033[92mLoading Tools Cog\033[0m")
+	
+	@commands.command(help='Calculates a math expression, X = current time')
+	async def calculate(self, ctx, *, expression: str="2+2"):
+		variables['X'] = datetime.datetime.now().timestamp()
+		variables['x'] = datetime.datetime.now().timestamp()
+	
+		output = parser.parse(expression).evaluate(variables)
+		embed = discord.Embed(title='Calculation')
+		embed.add_field(name='Input', value = f"`{expression}`")
+		embed.add_field(name='Output', value = f"`{output}`")
+		await ctx.send(embed=embed)
+	
+	@commands.command(help='Simplifies a math expression, X = current time')
+	async def simplify(self, ctx, *, expression: str="2+2"):
+		variables['X'] = datetime.datetime.now().timestamp()
+		variables['x'] = datetime.datetime.now().timestamp()
+	
+		output = parser.parse(expression).simplify(variables).toString()
+		embed = discord.Embed(title='Simplified')
+		embed.add_field(name='Input', value = f"`{expression}`")
+		embed.add_field(name='Output', value = f"`{output}`")
+		await ctx.send(embed=embed)
+	
+	@commands.command(help='Defines a variable for usage with $calculate')
+	async def define(self, ctx, varName, value):
+		variables[varName] = value
+		await ctx.send(f"Added `{varName}` to the global variables dictionary with a value of `{value}`")
+	
+	@commands.command(help='Returns a variable list')
+	async def variables(self, ctx):
+		embed = discord.Embed()
+		
+		for var in variables:
+			embed.add_field(name=var, value = variables[var], inline=False)
+		await ctx.send(embed=embed)
+			
 	
 	@commands.command(help='Gets Room Chan Information')
 	async def botstats(self, ctx):
