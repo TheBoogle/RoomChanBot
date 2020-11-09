@@ -9,9 +9,10 @@ import asyncio
 import aiohttp
 import os
 import mysql.connector
+from autocorrect import Speller
 from profanityfilter import ProfanityFilter
 pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger',''})
-
+bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx']
 
 
 mydb = mysql.connector.connect(
@@ -144,23 +145,30 @@ async def on_command_error(ctx,error):
 async def ban(guild, userid, reason):
 	await guild.ban(discord.Object(id=userid), reason=reason)
 
+
+spell = Speller(lang='en')
+
 @bot.event
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
 	
+	
+	
+	
 	attach = ctx.attachments
 	staffChannel = await bot.fetch_channel(722148701753311332)
+	
+	
+	
 	if len(attach) > 0:
 		for attachment in attach:
-			if attachment.filename.lower().endswith('.dll'):
-				await ctx.delete()
-				await ctx.channel.send(ctx.author.mention + " No DLL Files Allowed!")
-				await staffChannel.send(ctx.author.mention + " sent a DLL File")
-			elif attachment.filename.lower().endswith('.exe'):
-				await ctx.delete()
-				await ctx.channel.send(ctx.author.mention + " No EXE Files Allowed!")
-				await staffChannel.send(ctx.author.mention + " sent a EXE File")
+			for banned in bannedFileTypes:
+				if attachment.filename.lower().endswith('.'+banned):
+					await ctx.delete()
+					await ctx.channel.send(f"{ctx.author.mention} no {banned.upper()} file types allowed!")
+					await staffChannel.send(ctx.author.mention + f" sent a {banned.upper()} File")
+				
 	
 	if not ctx.guild and not author.bot:
 		user = await bot.fetch_user(643491766926049318)
@@ -193,6 +201,28 @@ async def on_message(ctx):
 			cursor.execute("INSERT INTO users VALUES(" + str(ctx.author.id) + "," + str(xp) + ')')
 		else:
 			currentXP = result[0][0] + xp
+			
+			if currentXP >= 100 * xp_per_level:
+				
+				role = ctx.guild.get_role(460944551130169346)
+				
+				member = ctx.author
+				roles = [role for role in member.roles]
+				i=0
+				found=False
+				while i < len(roles):
+					currentrole=roles[i]
+
+					if role.id == currentrole.id:
+						found=True
+						
+					i=i+1
+				
+				
+				if not found:
+					role = ctx.guild.get_role(460944551130169346)
+					await ctx.author.add_roles(role)
+					await ctx.channel.send(f"Congragulations {member.mention} on hitting level 100! Enjoy the AGM members role")
 			cursor.execute("UPDATE users SET user_xp = "+ str(currentXP)+" WHERE client_id = " +str(ctx.author.id))
 		mydb.commit()
         

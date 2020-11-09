@@ -16,7 +16,7 @@ mydb = mysql.connector.connect(
 	passwd='lol',
 	database="RoomChan"
 )
-weapons = ["AKM", "HK416", "Kar98K", "Mosin", "Duck Spine", "MP5K", "S12K", "Pump shotgun", "Double-Barrel shotgun", "Desert Eagle", "Fists", "Knife", "Lamp", "Rat", "No U", "Soda Can", "Gaming computer", "Beans"]
+weapons = ["Shotgun", "Super Shotgun", "Plasma Gun", "Nailgun", "Chaingun", "BFG 10k", "BFG 9k", "Railgun", "Pistol", "Chainsaw", "Crucible", "Unmaykr", "Ballista", "Heavy Cannon", "Rocket Launcher"]
 locations = ["Shelter", "Quarry", "Basecamp", "Airfield", "Millitary Base", "Big City 1", "Big City 2", "Village", "Qlyhen Mountain", "Llama Fields", "The Factory", "The Beach", "Middle of no where"]
 joinable = False
 class BattleRoyale(commands.Cog):
@@ -144,10 +144,12 @@ class BattleRoyale(commands.Cog):
 				await asyncio.sleep(2)
 				embed = discord.Embed(color=0xA52A2A)
 				embed.title=(f"{players[fighter1].name}#{players[fighter1].discriminator} and {players[fighter2].name}#{players[fighter2].discriminator} are fighting in {playerslocations[fighter1]}!")
-				if random.randint(1,3) == 1:
+				if random.randint(1,2) == 1:
 					playerkills[fighter1] += 1
 					embed.description=(f"`{players[fighter1].name}#{players[fighter1].discriminator}` killed `{players[fighter2].name}#{players[fighter2].discriminator}` with `{playersweapons[fighter1]}`.  They now have `{playerkills[fighter1]}` kills")
 					
+					
+
 					loser = fighter2
 					embed.set_thumbnail(url=players[fighter1].avatar_url)
 				else:
