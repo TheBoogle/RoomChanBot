@@ -12,7 +12,7 @@ import mysql.connector
 from autocorrect import Speller
 from profanityfilter import ProfanityFilter
 pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger'})
-bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm']
+bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
 
 
 mydb = mysql.connector.connect(
