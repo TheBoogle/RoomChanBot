@@ -6,6 +6,9 @@ import asyncio
 import aiohttp
 import os
 import json
+from MemePy import MemeGenerator
+MemeGenerator.add_external_resource_dir('Resources') 
+
 bernieBomb = 5
 bernieNuke = 30
 class Fun(commands.Cog):
@@ -14,6 +17,14 @@ class Fun(commands.Cog):
 		self.bot = bot
 	
 	print("\033[92mLoading Fun Cog\033[0m")
+	
+	
+	@commands.command(help='Arguments must be surrounded by quotes')
+	async def meme(self,ctx,Template, Top: str="TopText", Bottom: str="BottomText"):
+		async with ctx.channel.typing():
+			b = MemeGenerator.get_meme_image(Template, {Top, Bottom})
+			b.save('./meme.png')
+			await ctx.channel.send(file = discord.File('./meme.png'))
 	
 	@commands.command(help='Command is exclusive to Ciba')
 	async def ciba(self, ctx):
@@ -131,8 +142,6 @@ class Fun(commands.Cog):
 			member = ctx.author
 		if int(member.id) == 643491766926049318:
 			await ctx.send(member.mention+"'s pp: "+sizes[len(sizes)-1])
-		elif int(member.id) == 626879247876751380:
-			await ctx.send(member.mention+"'s pp: "+sizes[0])
 		elif int(member.id) == 748287469643890719:
 			await ctx.send(member.mention+"'s pp: {(.)}")
 		# ~ elif int(member.id) == 460040394999332885:

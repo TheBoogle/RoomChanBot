@@ -11,14 +11,18 @@ import os
 import mysql.connector
 from autocorrect import Speller
 from profanityfilter import ProfanityFilter
+import pyjokes
+
 pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger'})
+
+
 
 minimum_age = 30
 xp_per_level = 1000
 
 bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
 
-statuses = ["github/TheBoogle/RoomChanBot"]
+statuses = ["merry christmas", "merry christmas !", "merry christmas !!", "merry christmas !!!"]
 
 mydb = mysql.connector.connect(
 	host="localhost",
@@ -61,7 +65,7 @@ async def update_status():
 		for guild in guilds:
 			sum += len(guild.members)
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
-		await asyncio.sleep(120)
+		await asyncio.sleep(10)
 
 @bot.event
 async def on_member_join(member):
@@ -277,7 +281,7 @@ async def leaderboard(ctx, lines:int=None):
 		while i < lines:
 
 			
-			member = await bot.fetch_user(result2[i][0])
+			member = ctx.guild.get_member(result2[i][0])
 
 			if member == None:
 				pass
@@ -312,9 +316,15 @@ async def reloadbot(ctx):
 	msg = await ctx.send(embed=embed)
 	for filename in os.listdir('./cogs'):
 		if filename.endswith('.py'):
-			bot.unload_extension(f'cogs.{filename[:-3]}')
-			bot.load_extension(f'cogs.{filename[:-3]}')
-			embed.add_field(name=f'{filename[:-3]}', value="Loaded")
+			try:
+				try:
+					bot.unload_extension(f'cogs.{filename[:-3]}')
+				except:
+					pass
+				bot.load_extension(f'cogs.{filename[:-3]}')
+				embed.add_field(name=f'{filename[:-3]}', value="Loaded")
+			except:
+				embed.add_field(name=f'{filename[:-3]}', value="Failed to Load")
 			
 			await msg.edit(embed=embed)
 	embed.color=0x90EE90

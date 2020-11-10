@@ -18,26 +18,47 @@ import numpy as np
 
 
 parser = Parser()
+	
+
+def lvl(xp):
+	return xp / 1000
+
+parser.functions['level'] = lvl
+parser.functions['len'] = len
+parser.functions['str'] = str
+parser.functions['int'] = int
+
+
 variables = {'X':datetime.datetime.now().timestamp(),'x':datetime.datetime.now().timestamp()}
 
 class Tools(commands.Cog):
 	
 	def __init__(self, bot):
 		self.bot = bot
-	
+		
+
 	print("\033[92mLoading Tools Cog\033[0m")
-	
 	
 	@commands.command(help='Calculates a math expression, X = current time')
 	async def calculate(self, ctx, *, expression: str="2+2"):
+		msg = await ctx.channel.send("Calculating...")
 		variables['X'] = datetime.datetime.now().timestamp()
 		variables['x'] = datetime.datetime.now().timestamp()
 	
 		output = parser.parse(expression).evaluate(variables)
+
 		embed = discord.Embed(title='Calculation')
 		embed.add_field(name='Input', value = f"`{expression}`")
 		embed.add_field(name='Output', value = f"`{output}`")
-		await ctx.send(embed=embed)
+		if len(embed) >= 6000:
+			f = open("output.txt","w")
+			f.write(f'Input: {expression}' + "\n")
+			f.write(f'Output: {output}')
+			f.close()
+			await ctx.channel.send(content='Length of output was too long, changed to .txt file instead', file=discord.File('output.txt'))
+		else:
+			await msg.edit(content = None, embed=embed)
+		
 	
 	@commands.command(help='Simplifies a math expression, X = current time')
 	async def simplify(self, ctx, *, expression: str="2+2"):
@@ -54,7 +75,7 @@ class Tools(commands.Cog):
 	async def integer(self, ctx, varName, value):
 		variables[varName] = int(value)
 		await ctx.send(f"Defined int(`{varName}`) to the global variables dictionary with a value of `{value}`")
-	
+
 	@commands.command(help='Defines a string variable for usage with $calculate', aliases=['strdefine', 'str'])
 	async def string(self, ctx, varName, *, value):
 		variables[varName] = value
@@ -138,6 +159,7 @@ class Tools(commands.Cog):
 			
 	@commands.command(help='Gets you info on a member', aliases=['whois', 'whodat', 'who', 'view', 'profile'])
 	async def info(self, ctx, member: discord.Member=None):
+	
 		member = ctx.author if not member else member
 		roles = [role for role in member.roles]
 		
