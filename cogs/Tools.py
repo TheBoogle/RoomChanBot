@@ -10,9 +10,12 @@ from pyspectator.computer import Computer
 from pyspectator.processor import Cpu
 from gpiozero import CPUTemperature
 from py_expression_eval import Parser
-
+import math
 import psutil
 import datetime
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 parser = Parser()
 variables = {'X':datetime.datetime.now().timestamp(),'x':datetime.datetime.now().timestamp()}
@@ -23,6 +26,7 @@ class Tools(commands.Cog):
 		self.bot = bot
 	
 	print("\033[92mLoading Tools Cog\033[0m")
+	
 	
 	@commands.command(help='Calculates a math expression, X = current time')
 	async def calculate(self, ctx, *, expression: str="2+2"):
@@ -46,12 +50,18 @@ class Tools(commands.Cog):
 		embed.add_field(name='Output', value = f"`{output}`")
 		await ctx.send(embed=embed)
 	
-	@commands.command(help='Defines a variable for usage with $calculate')
-	async def define(self, ctx, varName, value):
-		variables[varName] = value
-		await ctx.send(f"Added `{varName}` to the global variables dictionary with a value of `{value}`")
+	@commands.command(help='Defines a variable for usage with $calculate', aliases=['define', 'int'])
+	async def integer(self, ctx, varName, value):
+		variables[varName] = int(value)
+		await ctx.send(f"Defined int(`{varName}`) to the global variables dictionary with a value of `{value}`")
 	
-	@commands.command(help='Returns a variable list')
+	@commands.command(help='Defines a string variable for usage with $calculate', aliases=['strdefine', 'str'])
+	async def string(self, ctx, varName, *, value):
+		variables[varName] = value
+		await ctx.send(f"Defined str(`{varName}`) to the global variables dictionary with a value of `{value}`")
+	
+	
+	@commands.command(help='Returns a variable list', aliases=['vars'])
 	async def variables(self, ctx):
 		embed = discord.Embed()
 		
