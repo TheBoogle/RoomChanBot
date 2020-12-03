@@ -53,7 +53,6 @@ async def setlevel(ctx, member:discord.User=None, level: int=None):
 	mydb.commit()
 
 async def update_status():
-	random.shuffle(statuses)
 	status=0
 	while True:
 		if status == len(statuses)-1:
