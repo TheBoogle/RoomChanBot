@@ -22,7 +22,7 @@ xp_per_level = 1000
 
 bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
 
-statuses = ["https://github.com/TheBoogle/RoomChanBot/"]
+statuses = [""It's Christmas","Jingle bells, jingle bells","Jingle all the way","Oh, what fun it is to ride","In a one horse open sleigh","Hey, jingle bells, jingle bells","Jingle all the way","Oh, what fun it is to ride","In a one horse open sleigh","Jingle bells, jingle bells","Jingle all the way","Oh, what fun it is to ride","In a one horse open sleigh","Hey, jingle bells, jingle bells","Jingle all the way","Oh, what fun it is to ride","In a one horse open sleigh","It's Christmas","Hey, jingle bells, jingle bells","Jingle all the way","Oh, what fun it is to ride","In a one horse open sleigh","Hey, jingle bells, jingle bells","Jingle all the way","Oh, what fun it is to ride","In a one horse open sleigh","It's Christmas""]
 
 mydb = mysql.connector.connect(
 	host="localhost",
@@ -65,7 +65,7 @@ async def update_status():
 		for guild in guilds:
 			sum += len(guild.members)
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
-		await asyncio.sleep(10)
+		await asyncio.sleep(8)
 
 @bot.event
 async def on_member_join(member):
