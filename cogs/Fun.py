@@ -7,8 +7,6 @@ import asyncio
 import aiohttp
 import os
 import json
-from MemePy import MemeGenerator
-MemeGenerator.add_external_resource_dir('Resources') 
 import soundfile as sf
 bernieBomb = 5
 bernieNuke = 30
@@ -36,14 +34,6 @@ class Fun(commands.Cog):
 		await asyncio.sleep(1.5)
 		
 		await voice.disconnect()
-
-	
-	@commands.command(help='Arguments must be surrounded by quotes')
-	async def meme(self,ctx,Template, Top: str="TopText", Bottom: str="BottomText"):
-		async with ctx.channel.typing():
-			b = MemeGenerator.get_meme_image(Template, {Top, Bottom})
-			b.save('./meme.png')
-			await ctx.channel.send(file = discord.File('./meme.png'))
 	
 	@commands.command(help='Command is exclusive to Ciba')
 	async def ciba(self, ctx):
