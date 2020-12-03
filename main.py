@@ -3,15 +3,26 @@ from discord.ext.commands import Bot
 from discord.ext import commands
 from discord.ext import tasks
 from discord.ext.tasks import loop
+from datetime import datetime, timedelta
 import random
 import asyncio
 import aiohttp
 import os
 import mysql.connector
+from autocorrect import Speller
 from profanityfilter import ProfanityFilter
-pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger',''})
+import pyjokes
+
+pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger', 'coomer'})
 
 
+
+minimum_age = 30
+xp_per_level = 1000
+
+bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
+
+statuses = ["merry christmas", "merry christmas !", "merry christmas !!", "merry christmas !!!"]
 
 mydb = mysql.connector.connect(
 	host="localhost",
@@ -21,12 +32,11 @@ mydb = mysql.connector.connect(
 
 )
 
-Bot = discord.Client(shard_count=1)
-bot = commands.Bot(command_prefix='$')
-
+Bot = discord.Client()
+bot = commands.Bot(command_prefix='$', shard_count = 1, intents = discord.Intents.all(), chunk_guilds_at_startup=True)
 
 def generateXP():
-	return random.randrange(250,500)
+	return random.randrange(25,50)
 
 @bot.command()
 @commands.is_owner()
@@ -42,9 +52,8 @@ async def setlevel(ctx, member:discord.User=None, level: int=None):
 		await ctx.send(embed=embed)
 	mydb.commit()
 
-
 async def update_status():
-	statuses = ["RooM", 'RooM 2', 'Quake', 'DooM']
+	random.shuffle(statuses)
 	status=0
 	while True:
 		if status == len(statuses)-1:
@@ -57,7 +66,42 @@ async def update_status():
 			sum += len(guild.members)
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
 		await asyncio.sleep(10)
-		
+
+@bot.event
+async def on_member_join(member):
+	channel = member.guild.get_channel(531310166662971422)
+
+	if not channel:
+		channel = member.guild.get_channel(782513121327317012)
+	
+	embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
+	embed.set_thumbnail(url=member.avatar_url)
+	
+	age = datetime.now().timestamp() - member.created_at.timestamp()
+	
+	print(age)
+	if age < minimum_age*86400:
+		embed=discord.Embed(color=0xf00a3a)
+		embed.add_field(name="You were kicked!", value=f"You have been kicked in {member.guild.name} for: `Your account must be {minimum_age} days or older to join.`", inline=True)
+		await member.send(embed=embed)
+		await member.guild.kick(member)
+	else:
+		await channel.send(embed=embed)
+	
+	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
+@bot.event
+async def on_member_remove(member):
+	channel = member.guild.get_channel(531310166662971422)
+
+	if not channel:
+		channel = member.guild.get_channel(782513121327317012)
+
+
+
+	embed = discord.Embed(title="Member Left", description=member.mention+" left the server", color=0xA52A2A)
+	embed.set_thumbnail(url=member.avatar_url)
+	await channel.send(embed=embed)
+	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
 
 @bot.event
 async def on_ready():
@@ -65,7 +109,7 @@ async def on_ready():
 	# ~ print('\033[92mConnected to proxy:{0.proxy}.'.format(Bot)+"\033[0m")
 	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
 	bot.loop.create_task(update_status())
-
+	
 @bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
 @commands.cooldown(1, 120, commands.BucketType.user)
 async def suggest(ctx, *, suggestion):
@@ -79,6 +123,7 @@ async def suggest(ctx, *, suggestion):
 	await msg.add_reaction('👎')
 	await ctx.message.delete()
 	await ctx.send('👍 Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
+
 @commands.has_permissions(manage_nicknames=True)
 async def resetnicknames(ctx):
 	members = ctx.guild.members
@@ -91,7 +136,6 @@ async def resetnicknames(ctx):
 			print('error changing '+member.name+"#"+member.discriminator)
 	print("Nickname reset complete")
 	await ctx.send("Nickname reset complete")
-	
 
 @bot.command()
 async def membercount(ctx):
@@ -101,8 +145,13 @@ async def membercount(ctx):
 async def on_command_error(ctx,error):
 	embed=discord.Embed(color=0xf00a3a)
 	embed.add_field(name="Error!", value=error, inline=True)
-	await ctx.message.delete()
+	try:
+		await ctx.message.delete()
+	except:
+		pass
+	
 	await ctx.send(embed=embed, delete_after=3)
+	
 async def ban(guild, userid, reason):
 	await guild.ban(discord.Object(id=userid), reason=reason)
 
@@ -110,24 +159,31 @@ async def ban(guild, userid, reason):
 async def on_message(ctx):
 	author = ctx.author
 	guild = ctx.guild
+
+	attach = ctx.attachments
+	staffChannel = await bot.fetch_channel(722148701753311332)
+	
+	if len(attach) > 0:
+		for attachment in attach:
+			for banned in bannedFileTypes:
+				if attachment.filename.lower().endswith('.'+banned.lower()):
+					await ctx.delete()
+					await ctx.channel.send(f"{ctx.author.mention} no {banned.upper()} file types allowed!")
+					await staffChannel.send(ctx.author.mention + f" sent a {banned.upper()} File")
+				
+	
+	if not ctx.guild and not author.bot:
+		user = await bot.fetch_user(643491766926049318)
+		await user.send(str(ctx.author) + ": " + ctx.content)
+		return
 	if ctx.channel.id == 762540670836670504:
 		if ctx.content != 'Caleb':
 			await ctx.delete()
 			await ctx.author.send('Are you stupid!? You can only say `Caleb` in #caleb >:(')
-	if ctx.content.lower()[0:1] != '$' and ctx.author.bot != True:
-		if 'tes' in ctx.content.lower() and 'room' in ctx.content.lower():
-			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing', delete_after=6)
-		elif 'can' in ctx.content.lower() and 'tes' in ctx.content.lower():
-			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing', delete_after=6)
-		elif 'want' in ctx.content.lower() and 'tes' in ctx.content.lower():
-			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from talking about RooM 2 testing', delete_after=6)
-		elif pf.is_profane(ctx.content.lower()) == True:
-			await ctx.delete()
-			await ctx.channel.send(author.mention+' Please refrain from using that language `'+pf.censor(ctx.content)+'`', delete_after=6)
-
+	if pf.is_profane(ctx.content.lower()) == True:
+		await ctx.delete()
+		await ctx.channel.send(author.mention+' Please refrain from using that language `'+pf.censor(ctx.content)+'`', delete_after=6)
+    
 	if ctx.author.bot == False and ctx.content[0:1] != "$" and len(ctx.content) > 1:
 		xp = generateXP()
 		cursor = mydb.cursor()
@@ -135,13 +191,35 @@ async def on_message(ctx):
 		result = cursor.fetchall()
 		if len(result) == 0:
 			cursor.execute("INSERT INTO users VALUES(" + str(ctx.author.id) + "," + str(xp) + ')')
-			mydb.commit()
 		else:
 			currentXP = result[0][0] + xp
+			
+			if currentXP >= 100 * xp_per_level and ctx.guild.id == 460932049394728990:
+				
+				role = ctx.guild.get_role(460944551130169346)
+				
+				member = ctx.author
+				roles = [role for role in member.roles]
+				i=0
+				found=False
+				while i < len(roles):
+					currentrole=roles[i]
+
+					if role.id == currentrole.id:
+						found=True
+						
+					i=i+1
+				
+				
+				if not found:
+					role = ctx.guild.get_role(460944551130169346)
+					await ctx.author.add_roles(role)
+					await ctx.channel.send(f"Congragulations {member.mention} on hitting level 100! Enjoy the AGM members role")
 			cursor.execute("UPDATE users SET user_xp = "+ str(currentXP)+" WHERE client_id = " +str(ctx.author.id))
-			mydb.commit()
+		mydb.commit()
+        
 	await bot.process_commands(ctx)
-xp_per_level = 1000
+
 @bot.command(aliases=['lvl','xp','exp', 'rank'])
 async def level(ctx, user: discord.User=None):
 	if user == None:
@@ -191,7 +269,7 @@ async def leaderboard(ctx, lines:int=None):
 	if lines == None:
 		lines = len(result)
 		if lines > 10:
-			lines = 25
+			lines = 10
 			
 	i=0
 	if i < 0: 
@@ -199,15 +277,20 @@ async def leaderboard(ctx, lines:int=None):
 	runs=1
 	if lines > len(result):
 		lines = len(result)
-	print(i)
-	while i < lines:
-		member = bot.get_user(result2[i][0])
-		if bot.get_user(result2[i][0]) == None:
-			cursor.execute("DELETE FROM users WHERE client_id = "+str(result2[i][0]))
-		else:
-			embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), inline=False, value="Level: "+str(result[i][0]//xp_per_level)+" Total XP: "+str(result[i][0]))
-			runs=runs+1
-		i=i+1
+
+	async with ctx.channel.typing():
+		while i < lines:
+
+			
+			member = ctx.guild.get_member(result2[i][0])
+
+			if member == None:
+				pass
+			else:
+				embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), inline=False, value="Level: "+str(result[i][0]//xp_per_level)+" Total XP: "+str(result[i][0]))
+				runs=runs+1
+			i=i+1
+
 	cursor.execute("SET @row_number = 0")
 	cursor.execute("SELECT (@row_number:=@row_number + 1) AS num, client_id, user_xp FROM users ORDER BY user_xp DESC")
 	result3 = cursor.fetchall()
@@ -220,46 +303,6 @@ async def leaderboard(ctx, lines:int=None):
 			break
 		i=i+1
 	await ctx.send(embed=embed)
-# @bot.event
-# async def on_member_join(member):
-	# try:
-		# if member.bot == False:
-			# channel=None
-			# try:
-				# channel = discord.utils.get(member.guild.channels, name='notifications')
-			# except:
-				# channel = discord.utils.get(member.guild.channels, name='join leave')
-			# if channel == None:
-				# try:
-					# channel = discord.utils.get(member.guild.channels, name='welcome')
-				# except:
-					# channel = discord.utils.get(member.guild.channels, name='hello goodbye')
-			# embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
-			# embed.set_thumbnail(url=member.avatar_url)
-			# await channel.send(embed=embed)
-	# except:
-		# print("Attempted to send a join message but failed")
-
-# @bot.event
-# async def on_member_remove(member):
-	# try:
-		# if member.bot == False:
-			# channel=None
-			# try:
-				# channel = discord.utils.get(member.guild.channels, name='notifications')
-			# except:
-				# channel = discord.utils.get(member.guild.channels, name='join-leave')
-			# if channel == None:
-				# try:
-					# channel = discord.utils.get(member.guild.channels, name='welcome')
-				# except:
-					# channel = discord.utils.get(member.guild.channels, name='hello-goodbye')
-				
-			# embed = discord.Embed(title="Member Left", description=member.mention+"("+member.display_name+"#"+member.discriminator+") left the server", color=0xA52A2A)
-			# embed.set_thumbnail(url=member.avatar_url)
-			# await channel.send(embed=embed)
-	# except:
-		# print("Attempted to send a removal message but failed")
 
 # load cogs	
 for filename in os.listdir('./cogs'):
@@ -274,9 +317,15 @@ async def reloadbot(ctx):
 	msg = await ctx.send(embed=embed)
 	for filename in os.listdir('./cogs'):
 		if filename.endswith('.py'):
-			bot.unload_extension(f'cogs.{filename[:-3]}')
-			bot.load_extension(f'cogs.{filename[:-3]}')
-			embed.add_field(name=f'{filename[:-3]}', value="Loaded")
+			try:
+				try:
+					bot.unload_extension(f'cogs.{filename[:-3]}')
+				except:
+					pass
+				bot.load_extension(f'cogs.{filename[:-3]}')
+				embed.add_field(name=f'{filename[:-3]}', value="Loaded")
+			except:
+				embed.add_field(name=f'{filename[:-3]}', value="Failed to Load")
 			
 			await msg.edit(embed=embed)
 	embed.color=0x90EE90

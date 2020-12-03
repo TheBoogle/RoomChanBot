@@ -6,7 +6,8 @@ import asyncio
 import aiohttp
 import os
 maxSpam = 20
-maxPurge = 1000
+maxPurge = 500
+
 class Mod(commands.Cog, ):
 	
 	def __init__(self, bot):
@@ -23,13 +24,13 @@ class Mod(commands.Cog, ):
 	@commands.command(pass_context=True, help='Deletes messages in bulk')
 	@commands.has_permissions(manage_messages=True)
 	async def purge(self, ctx, amount: int=10):
+		await ctx.message.delete()
 		if amount > maxPurge:
 			await ctx.send('`Amount must be less than or equal to '+str(maxPurge)+'`')
 		else:
 			await ctx.channel.purge(limit=amount+1)
-			purged = await ctx.send('Purged '+str(amount)+' messages')
-			await asyncio.sleep(2)
-			await purged.edit(content="a", delete_after=0)
+			await ctx.send(content = 'Purged '+str(amount)+' messages', delete_after=2)
+	
 	@commands.command(help='Sends an embed')
 	async def embed(self, ctx, title,  *, content):
 		await ctx.channel.purge(limit=1)

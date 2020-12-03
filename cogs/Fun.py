@@ -1,11 +1,15 @@
 import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
+from discord.utils import get
 import random
 import asyncio
 import aiohttp
 import os
 import json
+from MemePy import MemeGenerator
+MemeGenerator.add_external_resource_dir('Resources') 
+import soundfile as sf
 bernieBomb = 5
 bernieNuke = 30
 class Fun(commands.Cog):
@@ -14,6 +18,57 @@ class Fun(commands.Cog):
 		self.bot = bot
 	
 	print("\033[92mLoading Fun Cog\033[0m")
+	
+	
+	@commands.command()
+	@commands.cooldown(1, 30, commands.BucketType.guild)
+	async def taco(self, ctx):
+		channel = ctx.author.voice.channel
+		voice = get(self.bot.voice_clients, guild = ctx.guild)
+		
+		if voice and voice.is_connected():
+			await voice.move_to(channel)
+		else:
+			voice = await channel.connect()
+			
+		voice.play(discord.FFmpegPCMAudio("taco.wav"))
+
+		await asyncio.sleep(1.5)
+		
+		await voice.disconnect()
+
+	
+	@commands.command(help='Arguments must be surrounded by quotes')
+	async def meme(self,ctx,Template, Top: str="TopText", Bottom: str="BottomText"):
+		async with ctx.channel.typing():
+			b = MemeGenerator.get_meme_image(Template, {Top, Bottom})
+			b.save('./meme.png')
+			await ctx.channel.send(file = discord.File('./meme.png'))
+	
+	@commands.command(help='Command is exclusive to Ciba')
+	async def ciba(self, ctx):
+		if int(ctx.author.id) == 516713042558320664:
+			await ctx.send(":point_down: Gay :flushed: :point_down:")
+		else:
+			await ctx.send(":point_up: Gay :flushed: :point_up:")
+	@commands.command(help='Tells CanyonJack roomchan loves him')
+	@commands.cooldown(1, 1000, commands.BucketType.guild)
+	async def dmcanyon(self, ctx):
+		user = await self.bot.fetch_user(524686319004155924)
+		try:
+			await user.send('I love you CanyonJack ♥')
+			await ctx.channel.send("Your love message was sent!")
+		except:
+			await ctx.channel.send("An error occured while sending this message, he may have blocked Room Chan")
+	@commands.command(help='Tells PoptartNoahh "poopfartnoahh" ')
+	@commands.cooldown(1, 1000, commands.BucketType.guild)
+	async def dmpoptartnoahh(self, ctx):
+		user = await self.bot.fetch_user(281922284216909824)
+		try:
+			await user.send('poopfartnoahh xd')
+			await ctx.channel.send("Your hate message was sent!")
+		except:
+			await ctx.channel.send("An error occured while sending this message, he may have blocked Room Chan")
 	@commands.command(help='I love me some bread')
 	async def baguette(self, ctx, member:discord.User=None):
 		if member == None:
@@ -106,13 +161,15 @@ class Fun(commands.Cog):
 			member = ctx.author
 		if int(member.id) == 643491766926049318:
 			await ctx.send(member.mention+"'s pp: "+sizes[len(sizes)-1])
-		elif int(member.id) == 626879247876751380:
-			await ctx.send(member.mention+"'s pp: "+sizes[0])
+		elif int(member.id) == 748287469643890719:
+			await ctx.send(member.mention+"'s pp: {(.)}")
 		# ~ elif int(member.id) == 460040394999332885:
 			# ~ await ctx.send(member.display_name+"'s pp: () something about thats not right...")
 			
 		else:
+			random.seed(a=member.id)
 			await ctx.send(member.mention+"'s pp: "+random.choice(sizes))
+			random.seed(a=None)
 	@commands.command(aliases=["rr"], help='Hidden rickroll in an embed')
 	async def rickroll(self,ctx,*,message):
 		await ctx.channel.purge(limit=1)
