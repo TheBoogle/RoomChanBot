@@ -16,6 +16,8 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
+import requests
+
 
 parser = Parser()
 	
@@ -39,6 +41,137 @@ class Tools(commands.Cog):
 
 	print("\033[92mLoading Tools Cog\033[0m")
 	
+	@commands.command(help="Report's a player for whatever it is you want. Please don't abuse or you will be punished. Please make sure to attach video evidence/screenshots.")
+	async def report(self, ctx, Username, *, Reason):
+
+		Attach = ctx.message.attachments
+
+		toSend = []
+
+		for attachment in Attach:
+			toSend.insert(len(toSend), await attachment.to_file())
+
+		await ctx.message.delete()
+
+		await ctx.channel.send(content = "Thanks for your report! Our staff will investigate the issue. " + ctx.author.mention, delete_after=4)
+
+		
+
+		
+
+		Channel = ctx.guild.get_channel(783633385917513728)
+
+		r = requests.get(f"https://users.roblox.com/v1/users/search?keyword={Username}&limit=10")
+
+		r = r.json()
+
+		userId = r['data'][0]['id']
+
+		b = requests.get(f"https://users.roblox.com/v1/users/{userId}")
+
+		b = b.json()
+
+		embed = discord.Embed(title = 'User Report', description = f"The user `{ b['name'] }` was reported." )
+
+		embed.add_field(name='Reported User', value = f"`{ b['name'] }`")
+
+		embed.add_field(name='User Reporting', value = f"{ctx.author.mention}({ctx.author.id})")
+
+		embed.add_field(name='Reason', value = f"`{Reason}`")
+
+		embed.url = f"https://www.roblox.com/users/{userId}/profile"
+
+		
+
+	
+
+		AvatarUrl = requests.get(f'https://www.roblox.com/headshot-thumbnail/json?userId={userId}&width=420&height=420')
+
+		AvatarUrl = AvatarUrl.json()
+
+		AvatarUrl = AvatarUrl['Url']
+
+		embed.set_thumbnail(url=str(AvatarUrl))
+
+		creationDate = datetime.datetime.strptime(b['created'], '%Y-%m-%dT%H:%M:%S.%fZ').strftime("%m/%d/%y")
+
+		embed.add_field(name='Creation Date', value = creationDate, inline=False)
+
+		
+
+
+		await Channel.send(embed = embed, content = None, files = toSend)
+		
+	@commands.command(help="Report's a player for whatever it is you want. Please don't abuse or you will be punished.")
+	async def search(self, ctx, Username):
+		r = requests.get(f"https://users.roblox.com/v1/users/search?keyword={Username}&limit=10")
+
+		r = r.json()
+
+		userId = r['data'][0]['id']
+
+		embed = discord.Embed()
+
+		embed.url = f"https://www.roblox.com/users/{userId}/profile"
+
+		b = requests.get(f"https://users.roblox.com/v1/users/{userId}")
+
+		b = b.json()
+
+		embed.title = f"{b['name']} ({userId})"
+
+		creationDate = datetime.datetime.strptime(b['created'], '%Y-%m-%dT%H:%M:%S.%fZ').strftime("%m/%d/%y")
+
+		string = ""
+
+		if len(r['data'][0]['previousUsernames']) > 0:
+			for name in r['data'][0]['previousUsernames']:
+				string = string + name + ", "
+			
+		embed.add_field(name='Username(userId)', value=f"{b['name']}({userId})", inline=False)
+		if len(string) > 0:
+			embed.add_field(name='Previous Usernames', value = string, inline=True)
+		else:
+			embed.add_field(name='Previous Usernames', value ='N/A', inline=True)
+
+		embed.add_field(name='Creation Date', value = creationDate, inline=False)
+
+		
+
+
+		
+		if b['description']:
+			embed.add_field(name='User Description', value = b['description'], inline=False)
+		else:
+			embed.add_field(name='User Description', value = 'N/A', inline=False)
+
+		embed.add_field(name='Is Banned?', value = b['isBanned'], inline=False)
+
+		r = requests.get(f"https://users.roblox.com/v1/users/{userId}/status")
+
+		r = r.json()
+
+		if r['status']:
+			embed.add_field(name='Status', value = r['status'], inline=False)
+		else:
+			embed.add_field(name='Status', value = 'N/A', inline=False)
+
+		
+
+
+		AvatarUrl = requests.get(f'https://www.roblox.com/headshot-thumbnail/json?userId={userId}&width=420&height=420')
+
+		AvatarUrl = AvatarUrl.json()
+
+		AvatarUrl = AvatarUrl['Url']
+
+		embed.set_thumbnail(url=str(AvatarUrl))
+
+		await ctx.channel.send(embed = embed, content = None)
+
+
+
+
 	@commands.command(help='Calculates a math expression, X = current time')
 	async def calculate(self, ctx, *, expression: str="2+2"):
 		msg = await ctx.channel.send("Calculating...")
