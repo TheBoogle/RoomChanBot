@@ -213,7 +213,30 @@ async def on_message(ctx):
 				if not found:
 					role = ctx.guild.get_role(460944551130169346)
 					await ctx.author.add_roles(role)
-					await ctx.channel.send(f"Congragulations {member.mention} on hitting level 100! Enjoy the AGM members role")
+					await ctx.channel.send(f"Congragulations {member.mention} on hitting level 100! Enjoy the Advanced AGM members role")
+					
+			if currentXP >= 200 * xp_per_level and ctx.guild.id == 460932049394728990:
+				
+				role = ctx.guild.get_role(787042501780701225)
+				
+				member = ctx.author
+				roles = [role for role in member.roles]
+				i=0
+				found=False
+				while i < len(roles):
+					currentrole=roles[i]
+
+					if role.id == currentrole.id:
+						found=True
+						
+					i=i+1
+				
+				
+				if not found:
+					role = ctx.guild.get_role(787042501780701225)
+					await ctx.author.add_roles(role)
+					await ctx.channel.send(f"Congragulations {member.mention} on hitting level 200! Enjoy the Mega-Advanced AGM members role")
+
 			cursor.execute("UPDATE users SET user_xp = "+ str(currentXP)+" WHERE client_id = " +str(ctx.author.id))
 		mydb.commit()
         
