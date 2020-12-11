@@ -168,6 +168,13 @@ async def resetlevels(ctx):
 
 @bot.command()
 @commands.is_owner()
+async def savelevelbackup(ctx):
+	command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
+
+	import os; os.system(command)
+
+@bot.command()
+@commands.is_owner()
 async def loadlevelbackup(ctx):
 	command = "mysql -u boog -plol RoomChan < BACKUP.sql"
 
