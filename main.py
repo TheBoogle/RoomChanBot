@@ -172,14 +172,14 @@ async def savelevelbackup(ctx):
 	command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
 
 	import os; os.system(command)
-
+	await ctx.send("Level backup was created.")
 @bot.command()
 @commands.is_owner()
 async def loadlevelbackup(ctx):
 	command = "mysql -u boog -plol RoomChan < BACKUP.sql"
 
 	import os; os.system(command)
-
+	await ctx.send("Level backup was loaded.")
 
 @bot.event
 async def on_message(ctx):
