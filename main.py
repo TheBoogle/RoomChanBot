@@ -154,6 +154,26 @@ async def on_command_error(ctx,error):
 async def ban(guild, userid, reason):
 	await guild.ban(discord.Object(id=userid), reason=reason)
 
+@bot.command()
+@commands.is_owner()
+async def resetlevels(ctx):
+	command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
+
+	import os; os.system(command)
+	await asyncio.sleep(0.5)
+	cursor = mydb.cursor()
+	cursor.execute("UPDATE users SET user_xp = 0")
+	mydb.commit()
+	await ctx.send("Levels were reset!")
+
+@bot.command()
+@commands.is_owner()
+async def loadlevelbackup(ctx):
+	command = "mysql -u boog -plol RoomChan < BACKUP.sql"
+
+	import os; os.system(command)
+
+
 @bot.event
 async def on_message(ctx):
 	author = ctx.author
@@ -214,7 +234,7 @@ async def on_message(ctx):
 					role = ctx.guild.get_role(460944551130169346)
 					await ctx.author.add_roles(role)
 					await ctx.channel.send(f"Congragulations {member.mention} on hitting level 100! Enjoy the Advanced AGM members role")
-					
+
 			if currentXP >= 200 * xp_per_level and ctx.guild.id == 460932049394728990:
 				
 				role = ctx.guild.get_role(787042501780701225)
