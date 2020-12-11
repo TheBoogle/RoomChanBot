@@ -308,7 +308,13 @@ async def level(ctx, user: discord.User=None):
 
 		await ctx.send(embed=embed)
 @bot.command(aliases=["top", "leader"])
-async def leaderboard(ctx, lines:int=None):
+async def leaderboard(ctx, lines:int=10, start:int=0):
+	if lines:
+		lines = int(lines)
+	if start:
+		start = int(start)
+	else:
+		start = 0
 	cursor = mydb.cursor()
 	cursor.execute("SELECT user_xp from users ORDER BY user_xp DESC")
 	result = cursor.fetchall()
@@ -319,11 +325,13 @@ async def leaderboard(ctx, lines:int=None):
 		lines = len(result)
 		if lines > 10:
 			lines = 10
-			
-	i=0
+	
+	lines = lines + start
+
+	i=start
 	if i < 0: 
 		i=0
-	runs=1
+	runs=1+start
 	if lines > len(result):
 		lines = len(result)
 
@@ -336,7 +344,7 @@ async def leaderboard(ctx, lines:int=None):
 			if member == None:
 				pass
 			else:
-				embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), inline=False, value="Level: "+str(result[i][0]//xp_per_level)+" Total XP: "+str(result[i][0]))
+				embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), inline=False, value="**Level**: "+str(result[i][0]//xp_per_level)+" **Total XP**: "+str(result[i][0]))
 				runs=runs+1
 			i=i+1
 
