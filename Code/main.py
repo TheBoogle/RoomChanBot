@@ -35,7 +35,7 @@ Bot = discord.Client()
 bot = commands.Bot(command_prefix='$', shard_count = 1, intents = discord.Intents.all(), chunk_guilds_at_startup=True)
 
 def generateXP():
-	return random.randrange(25,50)
+	return random.randrange(75,125)
 	
 def calculateLevel(xp):
 	return int(math.sqrt(xp) / 2)
