@@ -289,7 +289,53 @@ class Tools(commands.Cog):
 			await asyncio.sleep(1)
 		embed.description="Countdown Complete!"
 		await msg.edit(embed=embed, delete_after=5)
-			
+	@bot.command()
+	@commands.is_owner()
+	async def savelevelbackup(ctx):
+		command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
+
+		import os; os.system(command)
+		await ctx.send("Level backup was created.")
+	@bot.command()
+	@commands.is_owner()
+	async def loadlevelbackup(ctx):
+		command = "mysql -u boog -plol RoomChan < BACKUP.sql"
+
+		import os; os.system(command)
+		await ctx.send("Level backup was loaded.")
+
+	@commands.has_permissions(manage_nicknames=True)
+	async def resetnicknames(ctx):
+		members = ctx.guild.members
+		for member in members:
+			try:
+				if member.nick != None:
+					await member.edit(nick=None)
+					print('changed '+member.name+"#"+member.discriminator)
+			except:
+				print('error changing '+member.name+"#"+member.discriminator)
+		print("Nickname reset complete")
+		await ctx.send("Nickname reset complete")
+
+
+	@bot.command()
+	async def membercount(ctx):
+		await ctx.send("`"+str(len(ctx.guild.members))+"` member's")
+
+	@bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
+	@commands.cooldown(1, 120, commands.BucketType.user)
+	async def suggest(ctx, *, suggestion):
+		suggestionChannelId = 754876657898094652
+		suggestionChannel = bot.get_channel(suggestionChannelId)
+		embed=discord.Embed(title="User Suggestion", description=suggestion)
+		embed.set_author(name=ctx.author.name+'#'+ctx.author.discriminator, icon_url=ctx.author.avatar_url)
+		msg = await suggestionChannel.send(embed=embed)
+
+		await msg.add_reaction('👍')
+		await msg.add_reaction('👎')
+		await ctx.message.delete()
+		await ctx.send('👍 Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
+
 	@commands.command(help='Gets you info on a member', aliases=['whois', 'whodat', 'who', 'view', 'profile'])
 	async def info(self, ctx, member: discord.Member=None):
 	

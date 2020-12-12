@@ -1,3 +1,4 @@
+# variables
 import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
@@ -15,9 +16,7 @@ import pyjokes
 import math
 pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger', 'coomer'})
 
-
-
-minimum_age = 30
+minimum_age = 30 # In days
 
 bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
 
@@ -28,11 +27,12 @@ mydb = mysql.connector.connect(
 	user="boog",
 	passwd="lol",
 	database="RoomChan"
-
 )
 
 Bot = discord.Client()
 bot = commands.Bot(command_prefix='$', shard_count = 1, intents = discord.Intents.all(), chunk_guilds_at_startup=True)
+
+# functions
 
 def generateXP():
 	return random.randrange(75,125)
@@ -42,21 +42,6 @@ def calculateLevel(xp):
 
 def calculateXp(level):
 	return int((level ** 2) * 4)
-
-
-@bot.command()
-@commands.is_owner()
-async def setlevel(ctx, member:discord.User=None, level: int=None):
-	cursor = mydb.cursor()
-	try:
-		cursor.execute("UPDATE users SET user_xp = "+ str(calculateXp(level))+" WHERE client_id = " +str(member.id))
-		await ctx.send("Set "+member.mention+"'s level to `"+str(level)+"`")
-	except:
-		embed=discord.Embed(color=0xf00a3a)
-		embed.add_field(name="Error!", value="Either level is too high, or user is not in database", inline=True)
-
-		await ctx.send(embed=embed)
-	mydb.commit()
 
 async def update_status():
 	status=0
@@ -71,6 +56,18 @@ async def update_status():
 			sum += len(guild.members)
 		await bot.change_presence(status=discord.Status.idle, activity=discord.Game(statuses[status]))
 		await asyncio.sleep(8)
+
+async def ban(guild, userid, reason):
+	await guild.ban(discord.Object(id=userid), reason=reason)
+
+# events
+
+@bot.event
+async def on_ready():
+	print('\033[92m{0.user} is online.'.format(bot)+"\033[0m")
+	# ~ print('\033[92mConnected to proxy:{0.proxy}.'.format(Bot)+"\033[0m")
+	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
+	bot.loop.create_task(update_status())
 
 @bot.event
 async def on_member_join(member):
@@ -94,6 +91,7 @@ async def on_member_join(member):
 		await channel.send(embed=embed)
 	
 	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
+
 @bot.event
 async def on_member_remove(member):
 	channel = member.guild.get_channel(531310166662971422)
@@ -109,44 +107,6 @@ async def on_member_remove(member):
 	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
 
 @bot.event
-async def on_ready():
-	print('\033[92m{0.user} is online.'.format(bot)+"\033[0m")
-	# ~ print('\033[92mConnected to proxy:{0.proxy}.'.format(Bot)+"\033[0m")
-	print('\033[92m{0.shard_count} shards running\033[0m'.format(Bot))
-	bot.loop.create_task(update_status())
-	
-@bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
-@commands.cooldown(1, 120, commands.BucketType.user)
-async def suggest(ctx, *, suggestion):
-	suggestionChannelId = 754876657898094652
-	suggestionChannel = bot.get_channel(suggestionChannelId)
-	embed=discord.Embed(title="User Suggestion", description=suggestion)
-	embed.set_author(name=ctx.author.name+'#'+ctx.author.discriminator, icon_url=ctx.author.avatar_url)
-	msg = await suggestionChannel.send(embed=embed)
-
-	await msg.add_reaction('👍')
-	await msg.add_reaction('👎')
-	await ctx.message.delete()
-	await ctx.send('👍 Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
-
-@commands.has_permissions(manage_nicknames=True)
-async def resetnicknames(ctx):
-	members = ctx.guild.members
-	for member in members:
-		try:
-			if member.nick != None:
-				await member.edit(nick=None)
-				print('changed '+member.name+"#"+member.discriminator)
-		except:
-			print('error changing '+member.name+"#"+member.discriminator)
-	print("Nickname reset complete")
-	await ctx.send("Nickname reset complete")
-
-@bot.command()
-async def membercount(ctx):
-	await ctx.send("`"+str(len(ctx.guild.members))+"` member's")
-
-@bot.event
 async def on_command_error(ctx,error):
 	embed=discord.Embed(color=0xf00a3a)
 	embed.add_field(name="Error!", value=error, inline=True)
@@ -157,36 +117,6 @@ async def on_command_error(ctx,error):
 	
 	await ctx.send(embed=embed, delete_after=3)
 	
-async def ban(guild, userid, reason):
-	await guild.ban(discord.Object(id=userid), reason=reason)
-
-@bot.command()
-@commands.is_owner()
-async def resetlevels(ctx):
-	command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
-
-	import os; os.system(command)
-	await asyncio.sleep(0.5)
-	cursor = mydb.cursor()
-	cursor.execute("UPDATE users SET user_xp = 0")
-	mydb.commit()
-	await ctx.send("Levels were reset!")
-
-@bot.command()
-@commands.is_owner()
-async def savelevelbackup(ctx):
-	command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
-
-	import os; os.system(command)
-	await ctx.send("Level backup was created.")
-@bot.command()
-@commands.is_owner()
-async def loadlevelbackup(ctx):
-	command = "mysql -u boog -plol RoomChan < BACKUP.sql"
-
-	import os; os.system(command)
-	await ctx.send("Level backup was loaded.")
-
 @bot.event
 async def on_message(ctx):
 	author = ctx.author
@@ -284,6 +214,33 @@ async def on_message(ctx):
         
 	await bot.process_commands(ctx)
 
+# commands
+@bot.command()
+@commands.is_owner()
+async def setlevel(ctx, member:discord.User=None, level: int=None):
+	cursor = mydb.cursor()
+	try:
+		cursor.execute("UPDATE users SET user_xp = "+ str(calculateXp(level))+" WHERE client_id = " +str(member.id))
+		await ctx.send("Set "+member.mention+"'s level to `"+str(level)+"`")
+	except:
+		embed=discord.Embed(color=0xf00a3a)
+		embed.add_field(name="Error!", value="Either level is too high, or user is not in database", inline=True)
+
+		await ctx.send(embed=embed)
+	mydb.commit()
+
+@bot.command()
+@commands.is_owner()
+async def resetlevels(ctx):
+	command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
+
+	import os; os.system(command)
+	await asyncio.sleep(0.5)
+	cursor = mydb.cursor()
+	cursor.execute("UPDATE users SET user_xp = 0")
+	mydb.commit()
+	await ctx.send("Levels were reset!")
+
 @bot.command(aliases=['lvl','xp','exp', 'rank'])
 async def level(ctx, user: discord.User=None):
 	if user == None:
@@ -318,6 +275,7 @@ async def level(ctx, user: discord.User=None):
 		embed.add_field(name="Error!", value="That user is not in the database!", inline=True)
 
 		await ctx.send(embed=embed)
+
 @bot.command(aliases=["top", "leader"])
 async def leaderboard(ctx, lines:int=10, start:int=0):
 	if lines:
@@ -372,11 +330,6 @@ async def leaderboard(ctx, lines:int=10, start:int=0):
 		i=i+1
 	await ctx.send(embed=embed)
 
-# load cogs	
-for filename in os.listdir('./cogs'):
-	if filename.endswith('.py'):
-		bot.load_extension(f'cogs.{filename[:-3]}')
-
 @bot.command(help="Reloads the bot and all its commands", aliases=['r', 'rb'])
 @commands.is_owner()
 async def reloadbot(ctx):
@@ -401,7 +354,12 @@ async def reloadbot(ctx):
 	await msg.edit(embed=embed)
 	print("Reload Complete!")
 
+# load cogs	
+for filename in os.listdir('./cogs'):
+	if filename.endswith('.py'):
+		bot.load_extension(f'cogs.{filename[:-3]}')
+
 f = open("token.txt", "r")
 token = f.read()
 
-bot.run(token)
+bot.run(token) # yeah you thought I was stupid huh
