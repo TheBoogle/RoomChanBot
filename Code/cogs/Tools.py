@@ -319,7 +319,7 @@ class Tools(commands.Cog):
 		if member == None:
 			member = ctx.author
 		embed = discord.Embed(title=member.name+"#"+member.discriminator+"'s avatar")
-		embed.set_image(url=member.avatar_url)
+		embed.set_image(url="https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.png?size=1024".format(member))
 		await ctx.send(embed=embed)
 	
 	@commands.command(help='Gets you info on a server', aliases=['aboutserver'])

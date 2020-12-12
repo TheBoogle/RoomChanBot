@@ -12,13 +12,12 @@ import mysql.connector
 from autocorrect import Speller
 from profanityfilter import ProfanityFilter
 import pyjokes
-
+import math
 pf = ProfanityFilter(custom_censor_list={'secks','sex', 'cum', 'nigga', 'nigger', 'coomer'})
 
 
 
 minimum_age = 30
-xp_per_level = 1000
 
 bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
 
@@ -37,13 +36,20 @@ bot = commands.Bot(command_prefix='$', shard_count = 1, intents = discord.Intent
 
 def generateXP():
 	return random.randrange(25,50)
+	
+def calculateLevel(xp):
+	return int(math.sqrt(xp) / 2)
+
+def calculateXp(level):
+	return int((level ** 2) * 4)
+
 
 @bot.command()
 @commands.is_owner()
 async def setlevel(ctx, member:discord.User=None, level: int=None):
 	cursor = mydb.cursor()
 	try:
-		cursor.execute("UPDATE users SET user_xp = "+ str(xp_per_level*level)+" WHERE client_id = " +str(member.id))
+		cursor.execute("UPDATE users SET user_xp = "+ str(calculateXp(level))+" WHERE client_id = " +str(member.id))
 		await ctx.send("Set "+member.mention+"'s level to `"+str(level)+"`")
 	except:
 		embed=discord.Embed(color=0xf00a3a)
@@ -220,7 +226,7 @@ async def on_message(ctx):
 		else:
 			currentXP = result[0][0] + xp
 			
-			if currentXP >= 100 * xp_per_level and ctx.guild.id == 460932049394728990:
+			if currentXP >= calculateXp(100) and ctx.guild.id == 460932049394728990:
 				
 				role = ctx.guild.get_role(460944551130169346)
 				
@@ -242,7 +248,7 @@ async def on_message(ctx):
 					await ctx.author.add_roles(role)
 					await ctx.channel.send(f"Congragulations {member.mention} on hitting level 100! Enjoy the Advanced AGM members role")
 
-			if currentXP >= 200 * xp_per_level and ctx.guild.id == 460932049394728990:
+			if currentXP >= calculateXp(200) and ctx.guild.id == 460932049394728990:
 				
 				role = ctx.guild.get_role(787042501780701225)
 				
@@ -279,7 +285,7 @@ async def level(ctx, user: discord.User=None):
 		result = cursor.fetchall()
 		xp=result[0][0]
 		embed = discord.Embed(title=user.name+"#"+user.discriminator, color=user.color)
-		level_number = int(result[0][0]) // xp_per_level
+		level_number = calculateLevel(int(result[0][0]))
 		embed.add_field(name="LVL", value = str(level_number))
 		totalxp=xp
 		cursor.execute('SET @row_number=0')
@@ -295,11 +301,7 @@ async def level(ctx, user: discord.User=None):
 				found=True
 				break
 			i=i+1
-		i=0
-		while i < level_number:
-			xp=xp-xp_per_level
-			i=i+1
-		embed.add_field(name="XP", value = str(xp)+"/"+str(xp_per_level))
+		embed.add_field(name="XP", value = str(xp-calculateXp(level_number)) +"/"+str(calculateXp(level_number+1)-calculateXp(level_number)))
 		embed.add_field(name="Total XP", value = str(totalxp))
 		await ctx.send(embed=embed)
 	except:
@@ -344,7 +346,7 @@ async def leaderboard(ctx, lines:int=10, start:int=0):
 			if member == None:
 				pass
 			else:
-				embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), inline=False, value="**Level**: "+str(result[i][0]//xp_per_level)+" **Total XP**: "+str(result[i][0]))
+				embed.add_field(name="@"+str(member)+" RANK: #"+str(runs), inline=False, value="**Level**: "+str(calculateLevel(result[i][0]))+" **Total XP**: "+str(result[i][0]))
 				runs=runs+1
 			i=i+1
 
