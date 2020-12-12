@@ -22,7 +22,7 @@ xp_per_level = 1000
 
 bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 'cmd', 'doc', 'docx', 'xlsx', 'Xls', 'xlsm', 'pif', 'jar', 'vbs', 'js', 'reg', 'poopfartnoah', 'py', 'lua', 'cs', 'c']
 
-statuses = ["Pink bagel is sooo hot"]
+statuses = ["smh my head"]
 
 mydb = mysql.connector.connect(
 	host="localhost",

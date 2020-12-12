@@ -17,10 +17,19 @@ class Mod(commands.Cog, ):
 	@commands.command(hidden=True, help='Shutsdown the bot')
 	@commands.is_owner()
 	async def shutdown(self, ctx):
-		await ctx.send("Shutting down")
+		await ctx.send("Shutting down...")
 		print("Bot was manually shutdown")
 		await self.bot.logout()
 	
+	@commands.command(hidden=True, help='Shutsdown the bot')
+	@commands.is_owner()
+	async def reboot(self, ctx):
+		await ctx.send("Rebooting...")
+		print("Bot was rebooted.")
+		await self.bot.logout()
+		os.system("cd ~/Desktop/RoomChanBot/ &&  sudo clear && python3 main.py")
+		
+
 	@commands.command(pass_context=True, help='Deletes messages in bulk')
 	@commands.has_permissions(manage_messages=True)
 	async def purge(self, ctx, amount: int=10):
