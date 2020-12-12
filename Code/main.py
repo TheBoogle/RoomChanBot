@@ -224,8 +224,17 @@ async def on_message(ctx):
 		if len(result) == 0:
 			cursor.execute("INSERT INTO users VALUES(" + str(ctx.author.id) + "," + str(xp) + ')')
 		else:
+			originalXP = result[0][0]
+
+			OriginalLevel = calculateLevel(originalXP)
+
 			currentXP = result[0][0] + xp
 			
+			newLevel = calculateLevel(currentXP)
+
+			# if newLevel > OriginalLevel:
+			# 	await ctx.author.send(f"You just leveled up to level {newLevel}!")
+
 			if currentXP >= calculateXp(100) and ctx.guild.id == 460932049394728990:
 				
 				role = ctx.guild.get_role(460944551130169346)
