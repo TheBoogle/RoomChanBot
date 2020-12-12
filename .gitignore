@@ -3,3 +3,4 @@ token.txt
 *.txt
 *.wav
 lol.sql
+.vscode/settings.json

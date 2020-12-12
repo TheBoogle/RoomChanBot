@@ -17,24 +17,6 @@ class Fun(commands.Cog):
 	
 	print("\033[92mLoading Fun Cog\033[0m")
 	
-	
-	@commands.command()
-	@commands.cooldown(1, 30, commands.BucketType.guild)
-	async def taco(self, ctx):
-		channel = ctx.author.voice.channel
-		voice = get(self.bot.voice_clients, guild = ctx.guild)
-		
-		if voice and voice.is_connected():
-			await voice.move_to(channel)
-		else:
-			voice = await channel.connect()
-			
-		voice.play(discord.FFmpegPCMAudio("taco.wav"))
-
-		await asyncio.sleep(1.5)
-		
-		await voice.disconnect()
-	
 	@commands.command(help='Command is exclusive to Ciba')
 	async def ciba(self, ctx):
 		if int(ctx.author.id) == 516713042558320664:
