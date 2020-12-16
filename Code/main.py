@@ -108,14 +108,8 @@ async def on_member_remove(member):
 
 @bot.event
 async def on_command_error(ctx,error):
-	embed=discord.Embed(color=0xf00a3a)
-	embed.add_field(name="Error!", value=error, inline=True)
-	try:
-		await ctx.message.delete()
-	except:
-		pass
-	
-	await ctx.send(embed=embed, delete_after=3)
+	print(error)
+	pass
 	
 @bot.event
 async def on_message(ctx):
