@@ -289,14 +289,14 @@ class Tools(commands.Cog):
 			await asyncio.sleep(1)
 		embed.description="Countdown Complete!"
 		await msg.edit(embed=embed, delete_after=5)
-	@bot.command()
+	@commands.command()
 	@commands.is_owner()
 	async def savelevelbackup(ctx):
 		command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
 
 		import os; os.system(command)
 		await ctx.send("Level backup was created.")
-	@bot.command()
+	@commands.command()
 	@commands.is_owner()
 	async def loadlevelbackup(ctx):
 		command = "mysql -u boog -plol RoomChan < BACKUP.sql"
@@ -318,11 +318,11 @@ class Tools(commands.Cog):
 		await ctx.send("Nickname reset complete")
 
 
-	@bot.command()
+	@commands.command()
 	async def membercount(ctx):
 		await ctx.send("`"+str(len(ctx.guild.members))+"` member's")
 
-	@bot.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
+	@commands.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
 	@commands.cooldown(1, 120, commands.BucketType.user)
 	async def suggest(ctx, *, suggestion):
 		suggestionChannelId = 754876657898094652
