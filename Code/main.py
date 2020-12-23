@@ -138,10 +138,11 @@ async def on_message(ctx):
 		user = await bot.fetch_user(643491766926049318)
 		await user.send(str(ctx.author) + ": " + ctx.content)
 		return
-	if ctx.channel.id == 762540670836670504:
-		if ctx.content != 'Caleb':
-			await ctx.delete()
-			await ctx.author.send('Are you stupid!? You can only say `Caleb` in #caleb >:(')
+	if ctx.channel.id == 673763813366956053:
+		await ctx.add_reaction("👍")
+		await ctx.add_reaction("♥️")
+		await ctx.add_reaction("😎")
+		
 	if pf.is_profane(ctx.content.lower()) == True:
 		await ctx.delete()
 		await ctx.channel.send(author.mention+' Please refrain from using that language `'+pf.censor(ctx.content)+'`', delete_after=6)
