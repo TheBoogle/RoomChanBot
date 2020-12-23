@@ -139,6 +139,8 @@ async def on_message(ctx):
 		await user.send(str(ctx.author) + ": " + ctx.content)
 		return
 	if ctx.channel.id == 673763813366956053:
+		if not "http" in ctx.content and len(ctx.attachments) == 0:
+			return False
 		await ctx.add_reaction("👍")
 		await ctx.add_reaction("♥️")
 		await ctx.add_reaction("😎")
