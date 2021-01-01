@@ -395,6 +395,7 @@ class Tools(commands.Cog):
 		embed = discord.Embed(title=ctx.author.name+"#"+ctx.author.discriminator+" asks...", description=message )
 		msg = await ctx.send(embed=embed)
 		await msg.add_reaction('✅')
+		await msg.add_reaction("<:maybe:765068279026417664>")
 		await msg.add_reaction('❌')
 def setup(bot):
 	bot.add_cog(Tools(bot))
