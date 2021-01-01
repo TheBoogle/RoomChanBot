@@ -357,6 +357,8 @@ class Tools(commands.Cog):
 		embed.add_field(name=f"Roles ({len(roles)})", value=" ".join([role.mention for role in roles]))
 		embed.add_field(name="Top role:", value=member.top_role.mention)
 		
+		embed.add_field(name="Mention", value=member.mention)
+
 		embed.add_field(name="Bot?", value=member.bot)
 		
 		await ctx.send(embed=embed)
