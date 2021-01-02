@@ -4,3 +4,5 @@ token.txt
 *.wav
 lol.sql
 .vscode/settings.json
+*.webm
+*.pyc
