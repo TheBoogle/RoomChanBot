@@ -38,7 +38,7 @@ class Music(commands.Cog):
         i = 0
         print(list(playlist)[i])
         while True:
-            radio_channel = self.bot.get_channel(770719723851612170)
+            radio_channel = self.bot.get_channel(794777900523323432)
 		
     
             vc = await radio_channel.connect()
