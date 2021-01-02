@@ -291,21 +291,21 @@ class Tools(commands.Cog):
 		await msg.edit(embed=embed, delete_after=5)
 	@commands.command()
 	@commands.is_owner()
-	async def savelevelbackup(ctx):
+	async def savelevelbackup(self, ctx):
 		command = "mysqldump -u boog -plol RoomChan > BACKUP.sql"
 
 		import os; os.system(command)
 		await ctx.send("Level backup was created.")
 	@commands.command()
 	@commands.is_owner()
-	async def loadlevelbackup(ctx):
+	async def loadlevelbackup(self, ctx):
 		command = "mysql -u boog -plol RoomChan < BACKUP.sql"
 
 		import os; os.system(command)
 		await ctx.send("Level backup was loaded.")
 
 	@commands.has_permissions(manage_nicknames=True)
-	async def resetnicknames(ctx):
+	async def resetnicknames(self, ctx):
 		members = ctx.guild.members
 		for member in members:
 			try:
@@ -319,14 +319,14 @@ class Tools(commands.Cog):
 
 
 	@commands.command()
-	async def membercount(ctx):
+	async def membercount(self, ctx):
 		await ctx.send("`"+str(len(ctx.guild.members))+"` member's")
 
 	@commands.command(aliases=['suggestion', 'sg'], help='Submit a suggestion to the developers. If the game is something other then Room 2, feel free to specify.')
 	@commands.cooldown(1, 120, commands.BucketType.user)
-	async def suggest(ctx, *, suggestion):
+	async def suggest(self, ctx, *, suggestion : str):
 		suggestionChannelId = 754876657898094652
-		suggestionChannel = bot.get_channel(suggestionChannelId)
+		suggestionChannel = self.bot.get_channel(suggestionChannelId)
 		embed=discord.Embed(title="User Suggestion", description=suggestion)
 		embed.set_author(name=ctx.author.name+'#'+ctx.author.discriminator, icon_url=ctx.author.avatar_url)
 		msg = await suggestionChannel.send(embed=embed)

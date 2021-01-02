@@ -11,56 +11,48 @@ import youtube_dl
 import soundfile as sf
 
 ydl_opts = {
-    'format': 'bestaudio/best',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'wav',
-        'preferredquality': '1'
-    }],
-    'prefer_ffmpeg': True,
-    'keepvideo': False,
-    'externaldownloader': 'aria2c'
+	'format': 'bestaudio/best',
+	'postprocessors': [{
+		'key': 'FFmpegExtractAudio',
+		'preferredcodec': 'wav',
+		'preferredquality': '1'
+	}],
+	'prefer_ffmpeg': True,
+	'keepvideo': False,
+	'externaldownloader': 'aria2c'
 }
 
-vc = None
-playlist = {
-    "song.wav"
-}
+
 class Music(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-    print("\033[92mLoading Music Cog\033[0m")
-   
-   
+	def __init__(self, bot):
+		self.bot = bot
+	print("\033[92mLoading Music Cog\033[0m")
 
-    @commands.command(help='Begins RoomChan Radio Playback')
-    async def radio(self, ctx):
-        i = 0
-        print(list(playlist)[i])
-        while True:
-            radio_channel = self.bot.get_channel(794777900523323432)
-		
-    
-            vc = await radio_channel.connect()
+	@commands.command()
+	async def play(self, ctx, url : str):
+		await ctx.send("Downloading song... this will take time as this bot is slow as hell on a Raspberry Pi 3, stop bitching about it.")
+		song_there = os.path.isfile("song.wav")
+		try:
+			if song_there:
+				os.remove("song.wav")
+		except PermissionError:
+			await ctx.send("Wait for the current playing music to end or use the 'stop' command")
+			return
 
-            
-           
-            vc.play(discord.FFmpegPCMAudio("song.wav"))
+		try:
+			voiceChannel = discord.utils.get(ctx.guild.voice_channels, name='The Boiler Room In Hell')
+			await voiceChannel.connect()
+			voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+		except:
+			pass
 
-           
-            f = sf.SoundFile('song.wav')
+		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+			ydl.download([url])
+		for file in os.listdir("./"):
+			if file.endswith(".wav"):
+				os.rename(file, "song.wav")
+		await ctx.send("Song has been downloaded.")
+		voice.play(discord.FFmpegPCMAudio("song.wav"))
 
-            await asyncio.sleep(len(f) / f.samplerate)
-
-                
-            
-            
-            i += 1
-            if i > len(list(playlist)):
-                i = 0
-        
-        
-        
-        
 def setup(bot):
-    bot.add_cog(Music(bot))
+	bot.add_cog(Music(bot))
