@@ -20,12 +20,12 @@ bannedFileTypes = ['exe', 'dll', 'bat', 'zip', 'rar', 'img', 'iso', '7z','pdf', 
 
 statuses = ["smh my head"]
 
-# mydb = mysql.connector.connect(
-# 	host="localhost",
-# 	user="boog",
-# 	passwd="lol",
-# 	database="RoomChan"
-# )
+mydb = mysql.connector.connect(
+	host="localhost",
+	user="boog",
+	passwd="lol",
+	database="RoomChan"
+)
 
 Bot = discord.Client()
 bot = commands.Bot(command_prefix='$', shard_count = 1, intents = discord.Intents.all(), chunk_guilds_at_startup=True)
