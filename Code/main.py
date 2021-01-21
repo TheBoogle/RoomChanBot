@@ -28,7 +28,7 @@ mydb = mysql.connector.connect(
 )
 
 Bot = discord.Client()
-bot = commands.Bot(command_prefix='$', shard_count = 1, intents = discord.Intents.all(), chunk_guilds_at_startup=True)
+bot = commands.Bot(command_prefix='$', shard_count = 1, intents = discord.Intents.all(), chunk_guilds_at_startup=True, case_insensitive=True)
 
 # functions
 
@@ -103,6 +103,7 @@ async def on_member_remove(member):
 	embed.set_thumbnail(url=member.avatar_url)
 	await channel.send(embed=embed)
 	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
+
 
 @bot.event
 async def on_command_error(ctx,error):
