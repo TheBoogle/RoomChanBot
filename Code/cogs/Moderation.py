@@ -169,10 +169,16 @@ class Mod(commands.Cog, ):
 		await ctx.send(embed=embed)
 	@commands.command(help='Bans a member')
 	@commands.has_permissions(ban_members=True)
-	async def ban(self, ctx, member:discord.User=None, *, reason=None):
+	async def ban(self, ctx, member, *, reason=None):
+		try:
+			print(member.id)
+		except:
+			member = await self.bot.fetch_user(int(member))
+
 		if member == None or member == ctx.message.author:
 			await ctx.channel.send("You cannot ban yourself")
 			return
+		
 		if reason == None:
 			reason = "No reason provided..."
 		logchannel = self.bot.get_channel(logchannelId)
