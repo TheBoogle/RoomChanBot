@@ -104,7 +104,6 @@ async def on_member_remove(member):
 	await channel.send(embed=embed)
 	await channel.edit(name = 'Member count: {}'.format(channel.guild.member_count))
 
-
 @bot.event
 async def on_command_error(ctx,error):
 	embed=discord.Embed(color=0xf00a3a)
