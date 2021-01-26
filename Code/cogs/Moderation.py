@@ -69,11 +69,10 @@ class Mod(commands.Cog, ):
 			cursor.execute("SELECT LAST_INSERT_ID();")
 			result = cursor.fetchall()
 			result = result[0][0]
-			mydb.commit()
+
 			await logchannel.send(f"Warned {member.mention}({member.id})! `Warning ID: {result}`")
 			await ctx.channel.send(f"Warned {member.mention}! `Warning ID: {result}`")
 
-			cursor = mydb.cursor()
 			cursor.execute(f"SELECT * FROM warnings WHERE UserID={member.id}")
 			result = cursor.fetchall()
 			mydb.commit()
