@@ -70,7 +70,10 @@ class Mod(commands.Cog, ):
 			result = cursor.fetchall()
 			result = result[0][0]
 
-			await logchannel.send(f"Warned {member.mention}({member.id})! `Warning ID: {result}`")
+			embed = discord.Embed(title = 'User Was Warned!')
+			embed.description = f"{ctx.author.mention}({ctx.author.id}) warned {member.mention}({member.id})! `Warning ID: {result}`"
+
+			await logchannel.send(embed=embed)
 			await ctx.channel.send(f"Warned {member.mention}! `Warning ID: {result}`")
 
 			cursor.execute(f"SELECT * FROM warnings WHERE UserID={member.id}")
@@ -114,7 +117,10 @@ class Mod(commands.Cog, ):
 		cursor.execute(f"DELETE FROM warnings WHERE warningID={warningID}")
 		mydb.commit()
 		await ctx.channel.send(f"Deleted warning with ID `{warningID}`")
-		await logchannel.send(f"Deleted warning with ID `{warningID}`")
+		embed = discord.Embed(title = 'Warning Deleted')
+		embed.description = f"{ctx.author.mention}({ctx.author.id} deleted warning with ID `{warningID}`"
+
+		await logchannel.send(embed=embed)
 
 	@commands.command(aliases=['warnings'])
 	@commands.has_permissions(manage_roles=True)
