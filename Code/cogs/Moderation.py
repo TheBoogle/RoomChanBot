@@ -147,7 +147,7 @@ class Mod(commands.Cog, ):
 		await self.bot.logout()
 	
 	@commands.command(hidden=True, help='Shutsdown the bot')
-	@commands.is_owner()
+	@commands.has_permissions(manage_roles=True)
 	async def reboot(self, ctx):
 		await ctx.send("Rebooting...")
 		print("Bot was rebooted.")
