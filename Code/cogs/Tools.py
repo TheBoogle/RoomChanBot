@@ -335,6 +335,25 @@ class Tools(commands.Cog):
 		await msg.add_reaction('👎')
 		await ctx.message.delete()
 		await ctx.send('👍 Thank you for your suggestion, '+ctx.author.mention+'. Not all suggestions will it make it into the game, but the staff will vote on it.', delete_after=10)
+	@commands.command()
+	async def rbxavatar(self, ctx, Username):
+		r = requests.get(f"https://users.roblox.com/v1/users/search?keyword={Username}&limit=10")
+
+		r = r.json()
+
+		if len(r) > 25:
+			id = r['data'][0]['id']
+			b = requests.get(f"https://users.roblox.com/v1/users/{id}")
+
+			b = b.json()
+			Username = b['name']
+
+			embed = discord.Embed(title = f"{Username}'s avatar", description = "Avatar From Roblox API")
+			embed.set_image(url=f"https://www.roblox.com/bust-thumbnail/image?userId={id}&width=420&height=420&format=png")
+			await ctx.send(embed=embed)
+		await ctx.send(f"Error with finding {Username}'s account.")
+
+
 
 	@commands.command(help='Gets you info on a member', aliases=['whois', 'whodat', 'who', 'view', 'profile'])
 	async def info(self, ctx, member: discord.Member=None):
