@@ -65,7 +65,7 @@ class Mod(commands.Cog, ):
 
 			
 			cursor = mydb.cursor()
-			cursor.execute(f"INSERT INTO warnings (UserId, Reason) VALUES({member.id}, '{reason}')")
+			cursor.execute(f"INSERT INTO warnings (UserId, ModID, Reason) VALUES({member.id}, {ctx.author.id}, '{reason}')")
 			cursor.execute("SELECT LAST_INSERT_ID();")
 			result = cursor.fetchall()
 			result = result[0][0]
@@ -106,7 +106,37 @@ class Mod(commands.Cog, ):
 				await ctx.channel.send(f"{member.mention} was banned for >3 warnings!")
 				await ctx.guild.ban(member, reason=">3 Warnings")
 
-
+	@commands.command(aliases=['rsn'])
+	@commands.has_permissions(manage_roles=True)
+	async def reason(self, ctx, warningId, *, newReason:str=None):
+		if newReason == None:
+			cursor = mydb.cursor()
+			cursor.execute(f"SELECT * FROM warnings WHERE warningID={warningId}")
+			result = cursor.fetchall()
+			mydb.commit()
+			embed = discord.Embed(title=f"Warning ID: `{warningId}`")
+			
+			try:
+				embed.add_field(name='Moderator', value=f"`{result[0][1]}`", inline = False)
+				embed.add_field(name='Warned User', value=f"`{result[0][0]}`", inline = False)
+				embed.add_field(name='Reason', value=f"`{result[0][2]}`", inline = False)
+				await ctx.send(embed=embed)
+			except:
+				await ctx.send(f"An error occured with finding warning `{warningId}`, are you sure it exists?")
+			
+			
+		else:
+			logchannel = self.bot.get_channel(logchannelId)
+			try:
+				cursor = mydb.cursor()
+				cursor.execute(f"UPDATE warnings SET Reason = '{newReason}' WHERE warningID={warningId}")
+				mydb.commit()
+				embed = discord.Embed(title=f"Updated Warning with ID: `{warningId}`", description = f"New reason: `{newReason}`")
+			except:
+				await ctx.send(f"An error occured with updating warning `{warningId}`, are you sure it exists?")
+			await ctx.send(embed=embed)
+			await logchannel.send(embed=embed)
+			
 
 
 	@commands.command(aliases=['deletewarn'])
