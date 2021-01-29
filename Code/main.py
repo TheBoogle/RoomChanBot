@@ -72,7 +72,7 @@ async def on_member_join(member):
 	channel = member.guild.get_channel(531310166662971422)
 
 	if not channel:
-		channel = member.guild.get_channel(782513121327317012)
+		channel = member.guild.get_channel(804576021025521675)
 	
 	embed = discord.Embed(title="Member Joined", description=member.mention+" joined the server", color=0x90EE90)
 	embed.set_thumbnail(url=member.avatar_url)
@@ -95,7 +95,7 @@ async def on_member_remove(member):
 	channel = member.guild.get_channel(531310166662971422)
 
 	if not channel:
-		channel = member.guild.get_channel(782513121327317012)
+		channel = member.guild.get_channel(804576021025521675)
 
 
 
