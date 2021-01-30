@@ -341,17 +341,16 @@ class Tools(commands.Cog):
 
 		r = r.json()
 
-		if len(r) > 25:
-			id = r['data'][0]['id']
-			b = requests.get(f"https://users.roblox.com/v1/users/{id}")
+		id = r['data'][0]['id']
+		b = requests.get(f"https://users.roblox.com/v1/users/{id}")
 
-			b = b.json()
-			Username = b['name']
+		b = b.json()
+		Username = b['name']
 
-			embed = discord.Embed(title = f"{Username}'s avatar", description = "Avatar From Roblox API")
-			embed.set_image(url=f"https://www.roblox.com/bust-thumbnail/image?userId={id}&width=420&height=420&format=png")
-			await ctx.send(embed=embed)
-		await ctx.send(f"Error with finding {Username}'s account.")
+		embed = discord.Embed(title = f"{Username}'s avatar", description = "Avatar From Roblox API")
+		embed.set_image(url=f"https://www.roblox.com/bust-thumbnail/image?userId={id}&width=420&height=420&format=png")
+		await ctx.send(embed=embed)
+
 
 
 
