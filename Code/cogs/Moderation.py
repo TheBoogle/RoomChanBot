@@ -25,7 +25,10 @@ class Mod(commands.Cog, ):
 	
 	def __init__(self, bot):
 		self.bot = bot
-		
+	
+	
+
+
 	print("\033[92mLoading Moderation Cog\033[0m")
 	
 	# @commands.command()
@@ -165,8 +168,12 @@ class Mod(commands.Cog, ):
 			embed.description = 'This user has no warnings.'
 		else:
 			for x in result:
-				embed.add_field(name=f'Warning `ID:{x[2]}`', value=f'Reason: `{x[1]}`',inline=False)
-		
+				try:
+					b = self.bot.get_user(int(x[1]))
+					embed.add_field(name=f'Warning `ID:{x[3]}`', value=f'Reason: `{x[2]}` | Warned by: {b.mention}`({x[1]})`',inline=False)
+				except:
+					embed.add_field(name=f'Warning `ID:{x[3]}`', value=f'Reason: `{x[2]}` | Warned by: `({x[1]})`',inline=False)
+
 		await ctx.send(embed=embed)
 
 	@commands.command(hidden=True, help='Shutsdown the bot')
@@ -204,11 +211,7 @@ class Mod(commands.Cog, ):
 		await ctx.send(embed=embed)
 	@commands.command(help='Bans a member')
 	@commands.has_permissions(ban_members=True)
-	async def ban(self, ctx, member, *, reason=None):
-		try:
-			print(member.id)
-		except:
-			member = await self.bot.fetch_user(int(member))
+	async def ban(self, ctx, member:discord.User=None, *, reason=None):
 
 		if member == None or member == ctx.message.author:
 			await ctx.channel.send("You cannot ban yourself")
