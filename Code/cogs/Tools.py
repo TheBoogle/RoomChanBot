@@ -6,6 +6,7 @@ import random
 import asyncio
 import aiohttp
 import os
+import re
 from pyspectator.computer import Computer
 from pyspectator.processor import Cpu
 from gpiozero import CPUTemperature
@@ -33,6 +34,9 @@ parser.functions['int'] = int
 
 variables = {'X':datetime.datetime.now().timestamp(),'x':datetime.datetime.now().timestamp()}
 
+def comma_value(x):
+	return "{:,}".format(x)
+
 class Tools(commands.Cog):
 	
 	def __init__(self, bot):
@@ -41,6 +45,68 @@ class Tools(commands.Cog):
 
 	print("\033[92mLoading Tools Cog\033[0m")
 	
+	@commands.has_permissions(manage_nicknames=True)
+	async def resetnicks(self, ctx):
+		members = ctx.guild.members
+		for member in members:
+			try:
+				if member.nick != None:
+					await member.edit(nick=None)
+					print('changed '+member.name+"#"+member.discriminator)
+			except:
+				print('error changing '+member.name+"#"+member.discriminator)
+		print("Nickname reset complete")
+		await ctx.send("Nickname reset complete")
+
+	@commands.command()
+	async def rrcodes(self,ctx):
+		r = requests.get(f"http://192.168.1.191:5000/api/supersecretcodes69")
+
+		r = r.json()
+
+		embed = discord.Embed(title='Risky Ropes Codes')
+
+		for k,v in enumerate(r):
+			embed.add_field(name=v, value=r[v], inline=False)
+
+		await ctx.send(embed=embed)
+
+	@commands.command()
+	async def rrstats(self,ctx,Username):
+		r = requests.get(f"https://users.roblox.com/v1/users/search?keyword={Username}&limit=10")
+
+		r = r.json()
+
+
+		Username = r['data'][0]['name']
+		userId = r['data'][0]['id']
+		
+		r = requests.get(f"http://192.168.1.191:5000/api/stats?userid={userId}")
+
+		r = r.json()
+
+		try:
+			embed = discord.Embed(title = 'Risky Ropes Stats', description=f'Stats for `{Username}`.')
+
+
+			if r['Credits'] == None:
+				r['Credits'] = 'INF'
+			embed.add_field(name='Credits', value=r['Credits'],inline=False)
+
+			embed.add_field(name='XP/LVL', value=f"XP:`{comma_value(r['XP'])}` | LVL:`{comma_value(r['LVL'])}`",inline=False)
+			embed.add_field(name='Wins', value=comma_value(r['Wins']),inline=False)
+			embed.add_field(name='Ropes Deployed', value=comma_value(r['Ropes']),inline=False)
+			embed.add_field(name='Hours Played', value=comma_value(round((r['PlayTime']/60)/60,2)),inline=False)
+
+
+			await ctx.send(embed=embed)
+		except:
+			await ctx.send(f"Could not find stats for `{Username}`, this user is yet to play the game.", delete_after = 3)
+
+
+
+
+
 	@commands.command(help="Report's a player for whatever it is you want. Please don't abuse or you will be punished. Please make sure to attach video evidence/screenshots.")
 	async def report(self, ctx, Username, *, Reason):
 
@@ -101,7 +167,10 @@ class Tools(commands.Cog):
 
 
 		await Channel.send(embed = embed, content = None, files = toSend)
-		
+
+
+
+
 	@commands.command(help="Report's a player for whatever it is you want. Please don't abuse or you will be punished.")
 	async def search(self, ctx, Username):
 		r = requests.get(f"https://users.roblox.com/v1/users/search?keyword={Username}&limit=10")
@@ -304,18 +373,7 @@ class Tools(commands.Cog):
 		import os; os.system(command)
 		await ctx.send("Level backup was loaded.")
 
-	@commands.has_permissions(manage_nicknames=True)
-	async def resetnicknames(self, ctx):
-		members = ctx.guild.members
-		for member in members:
-			try:
-				if member.nick != None:
-					await member.edit(nick=None)
-					print('changed '+member.name+"#"+member.discriminator)
-			except:
-				print('error changing '+member.name+"#"+member.discriminator)
-		print("Nickname reset complete")
-		await ctx.send("Nickname reset complete")
+	
 
 
 	@commands.command()

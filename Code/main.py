@@ -106,6 +106,10 @@ async def on_member_remove(member):
 
 @bot.event
 async def on_command_error(ctx,error):
+
+	if str(error).find('not found') != -1:
+		return
+
 	embed=discord.Embed(color=0xf00a3a)
 	embed.add_field(name="Error!", value=error, inline=True)
 	try:
@@ -143,7 +147,7 @@ async def on_message(ctx):
 		await ctx.add_reaction("♥️")
 		await ctx.add_reaction("😎")
 		
-	if pf.is_profane(ctx.content.lower()) == True:
+	if pf.is_profane(ctx.content.lower()) == True and ctx.guild.id == 460932049394728990:
 		await ctx.delete()
 		await ctx.channel.send(author.mention+' Please refrain from using that language `'+pf.censor(ctx.content)+'`', delete_after=6)
     
